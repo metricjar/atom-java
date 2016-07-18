@@ -35,7 +35,7 @@ public class Request {
     }
 
     public Response Get() {
-        String url = url_ + "?data=" + Utils.base64Encode(data_);
+        String url = url_ + "?data=" + Utils.urlEncode(Utils.base64Encode(data_));
         printLog("Request URL: " + url);
 
         return sendRequest(url, "GET");
@@ -66,18 +66,18 @@ public class Request {
             for (Map.Entry<String, String> entry : headers_.entrySet()) {
                 connection.setRequestProperty(entry.getKey(), entry.getValue());
             }
+            connection.setRequestProperty("Content-Type", "application/json");
 
-            if (method == "POST") {
+            if (method.equals("POST")) {
+                connection.setDoOutput(true);
                 outStream = new DataOutputStream(connection.getOutputStream());
                 outStream.write(data_.getBytes("UTF-8"));
                 outStream.flush();
                 outStream.close();
             }
 
-            connection.setRequestProperty("Content-Type", "application/json");
-
             status = connection.getResponseCode();
-            new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            inputReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
             StringBuffer response = new StringBuffer();
