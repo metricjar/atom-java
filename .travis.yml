@@ -7,6 +7,6 @@ before_install:
 install:
   - mvn test-compile -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
-  - mvn test jacoco:report
+  - mvn -Pcobertura clean cobertura:cobertura
 after_success:
   - mvn coveralls:report
