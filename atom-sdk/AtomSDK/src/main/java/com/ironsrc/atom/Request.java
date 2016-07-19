@@ -1,3 +1,6 @@
+/**
+ * Created by g8y3e on 7/18/16.
+ */
 package com.ironsrc.atom;
 
 import java.io.BufferedReader;
@@ -9,9 +12,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by g8y3e on 7/18/16.
- */
 public class Request {
     private static String TAG_ = "Request";
 
@@ -24,16 +24,30 @@ public class Request {
 
     protected Boolean isDebug_;
 
+    /**
+     * Constructor for Request
+     * @param url for server address
+     * @param data for sending data
+     * @param headers for sending headers
+     */
     public Request(String url, String data, HashMap<String, String> headers) {
         url_ = url;
         data_ = data;
         headers_ = headers;
     }
 
+    /**
+     * Enable print debug information
+     * @param isDebug debug state
+     */
     public void enableDebug(Boolean isDebug) {
         isDebug_ = isDebug;
     }
 
+    /**
+     * GET request to server
+     * @return response from server
+     */
     public Response Get() {
         String url = url_ + "?data=" + Utils.urlEncode(Utils.base64Encode(data_));
         printLog("Request URL: " + url);
@@ -41,12 +55,22 @@ public class Request {
         return sendRequest(url, "GET");
     }
 
+    /**
+     * POST request to server
+     * @return response from server
+     */
     public Response Post() {
         printLog("Request URL: " + url_);
 
         return sendRequest(url_, "POST");
     }
 
+    /**
+     * Sends the request.
+     * @param url server url
+     * @param method send data
+     * @return response from server
+     */
     private Response sendRequest(String url, String method) {
         String data = "";
         String error = "";
@@ -110,6 +134,12 @@ public class Request {
         return new Response(error, data, status);
     }
 
+    /**
+     * Create Http Url connection
+     * @param url host server url
+     * @return http url object
+     * @throws IOException
+     */
     private HttpURLConnection createConnection(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) (new URL(url)).openConnection();
         connection.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLIS);
@@ -118,6 +148,10 @@ public class Request {
         return connection;
     }
 
+    /**
+     * Prints the log.
+     * @param data print debug data
+     */
     protected void printLog(String data) {
         System.out.println(TAG_ + ": " + data);
     }

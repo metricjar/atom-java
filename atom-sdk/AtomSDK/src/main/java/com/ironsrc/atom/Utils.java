@@ -1,3 +1,6 @@
+/**
+ * Created by g8y3e on 7/18/16.
+ */
 package com.ironsrc.atom;
 
 import com.google.gson.Gson;
@@ -10,14 +13,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 
-/**
- * Created by g8y3e on 7/18/16.
- */
 public class Utils {
+    /**
+     * Convert Object to json string
+     * @param object data for convert
+     * @return json string
+     */
     public static String objectToJson(Object object) {
         return new Gson().toJson(object);
     }
 
+    /**
+     * Convert List to json string
+     * @param listData data for convert
+     * @return json string
+     */
     public static String listToJson(LinkedList<String> listData) {
         String resultJson = "[";
         for (String entry: listData) {
@@ -30,6 +40,12 @@ public class Utils {
         return resultJson;
     }
 
+    /**
+     * Encode data to HMAC SHA-256
+     * @param data data for encode
+     * @param key key for encode
+     * @return encoded data
+     */
     public static String encodeHmac(String data, String key) {
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
@@ -44,6 +60,11 @@ public class Utils {
         return "";
     }
 
+    /**
+     * Encode data to base64
+     * @param data data to encode
+     * @return encoded data
+     */
     public static String base64Encode(String data) {
         BASE64Encoder encoder = new BASE64Encoder();
         try {
@@ -55,6 +76,11 @@ public class Utils {
         return "";
     }
 
+    /**
+     * Url encode data for url
+     * @param data data to escape
+     * @return escaped data
+     */
     public static String urlEncode(String data) {
         try {
             return URLEncoder.encode(data, "UTF-8");
