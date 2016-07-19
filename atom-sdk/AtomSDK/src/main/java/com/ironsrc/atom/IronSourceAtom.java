@@ -183,12 +183,18 @@ public class IronSourceAtom {
      * @return request json data
      */
     protected String GetRequestData(String stream, String data, String authKey) {
-        String hash = Utils.encodeHmac(data, authKey);
+        String hash = "";
+        if (authKey.length() > 0) {
+            hash = Utils.encodeHmac(data, authKey);
+        }
+
 
         HashMap<String, String> eventObject = new HashMap<String, String>();
         eventObject.put("table", stream);
         eventObject.put("data", data);
-        eventObject.put("auth", hash);
+        if (authKey.length() > 0) {
+            eventObject.put("auth", hash);
+        }
         String jsonEvent = Utils.objectToJson(eventObject);
 
         printLog("Request body: " + jsonEvent);

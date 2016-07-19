@@ -4,6 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <maven.jacoco.version>0.7.6.201602180812</maven.jacoco.version>
+        <maven.cobertura.version>2.7</maven.cobertura.version>
+    </properties>
+
     <groupId>com.ironsrc.atom</groupId>
     <artifactId>atom-sdk</artifactId>
     <version>1.0.0</version>
@@ -24,17 +29,56 @@
             <version>2.2.4</version>
         </dependency>
     </dependencies>
+
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.1.0</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/Response.class</exclude>
-                    </excludes>
+                    <sourceDirectories>
+                        <sourceDirectory>module1/src/main/resources</sourceDirectory>
+                    </sourceDirectories>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <version>${maven.cobertura.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>cobertura</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                            <instrumentation>
+                                <ignores>
+                                    <ignore>com.ironsrc.atom.HttpMethod</ignore>
+                                </ignores>
+                            </instrumentation>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
