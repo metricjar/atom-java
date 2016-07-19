@@ -32,7 +32,7 @@
     </dependencies>
 
 
-    <build>
+    <reporting>
         <plugins>
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
@@ -51,8 +51,16 @@
                     <check>true</check>
                     <format>xml</format>
                     <aggregate>true</aggregate>
+                    <instrumentation>
+                        <ignores>
+                            <ignore>com.ironsrc.atom.HttpMethod</ignore>
+                            <ignore>com.ironsrc.atom.Request</ignore>
+                            <ignore>com.ironsrc.atom.Response</ignore>
+                            <ignore>com.ironsrc.atom.IronSourceAtom</ignore>
+                        </ignores>
+                    </instrumentation>
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </reporting>
 </project>
