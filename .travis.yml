@@ -1,10 +1,13 @@
 language: java
 sudo: false
 jdk:
-  - oraclejdk8
+  - oraclejdk7
+  
 before_install:
   - cd atom-sdk/AtomSDK/
 install:
   - mvn test-compile -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
-  - mvn clean cobertura:cobertura org.eluder.coveralls:coveralls-maven-plugin:report
+  - mvn -Pcobertura clean cobertura:cobertura
+after_success:
+  - mvn coveralls:report
