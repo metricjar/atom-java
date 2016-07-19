@@ -2,6 +2,8 @@
 
 [![License][license-image]][license-url]
 [![Docs][docs-image]][docs-url]
+[![Build status][travis-image]][travis-url]
+[![Coverage Status][coverage-image]][coverage-url]
 
 atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-management) SDK for Java.
 
@@ -50,3 +52,7 @@ MIT
 [license-url]: LICENSE
 [docs-image]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-url]: https://ironsource.github.io/atom-java/
+[travis-image]: https://travis-ci.org/ironSource/atom-java.svg?branch=master
+[travis-url]: https://travis-ci.org/ironSource/atom-java
+[coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
+[coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
