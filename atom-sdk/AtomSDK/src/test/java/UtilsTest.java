@@ -44,12 +44,55 @@ public class UtilsTest {
     }
 
     @Test
+    public void testEncodeHmacException() {
+        String expectedStr = "";
+
+        String testInput = "{\"test\": \"data 1\"}";
+        String testKey = "";
+
+        Assert.assertEquals(expectedStr, Utils.encodeHmac(testInput, testKey));
+    }
+
+    @Test
     public void testBase64Encode() {
         String expectedStr = "eyJ0ZXN0IjogImRhdGEgMSJ9";
 
         String testData = "{\"test\": \"data 1\"}";
 
-        String resultData = Utils.base64Encode(testData);
+        String resultData = Utils.base64Encode(testData, "UTF-8");
+
+        Assert.assertEquals(expectedStr, resultData);
+    }
+
+    @Test
+    public void testBase64EncodeException() {
+        String expectedStr = "";
+
+        String testData = "{\"test\": \"data 1\"}";
+
+        String resultData = Utils.base64Encode(testData, "UTF-81");
+
+        Assert.assertEquals(expectedStr, resultData);
+    }
+
+    @Test
+    public void testUrlEncode() {
+        String expectedStr = "%7B%22test%22%3A+%22data+1%22%7D";
+
+        String testData = "{\"test\": \"data 1\"}";
+
+        String resultData = Utils.urlEncode(testData, "UTF-8");
+
+        Assert.assertEquals(expectedStr, resultData);
+    }
+
+    @Test
+    public void testUrlEncodeException() {
+        String expectedStr = "";
+
+        String testData = "{\"test\": \"data 1\"}";
+
+        String resultData = Utils.urlEncode(testData, "UTF-81");
 
         Assert.assertEquals(expectedStr, resultData);
     }

@@ -49,7 +49,8 @@ public class Request {
      * @return response from server
      */
     public Response Get() {
-        String url = url_ + "?data=" + Utils.urlEncode(Utils.base64Encode(data_));
+        String encoding = "UTF-8";
+        String url = url_ + "?data=" + Utils.urlEncode(Utils.base64Encode(data_, encoding), encoding);
         printLog("Request URL: " + url);
 
         return sendRequest(url, "GET");

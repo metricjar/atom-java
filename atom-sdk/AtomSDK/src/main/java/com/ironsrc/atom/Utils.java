@@ -63,12 +63,13 @@ public class Utils {
     /**
      * Encode data to base64
      * @param data data to encode
+     * @param encoding for example "UTF-8"
      * @return encoded data
      */
-    public static String base64Encode(String data) {
+    public static String base64Encode(String data, String encoding) {
         BASE64Encoder encoder = new BASE64Encoder();
         try {
-            return encoder.encode(data.getBytes("UTF-8"));
+            return encoder.encode(data.getBytes(encoding));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -79,11 +80,12 @@ public class Utils {
     /**
      * Url encode data for url
      * @param data data to escape
+     * @param encoding for example "UTF-8"
      * @return escaped data
      */
-    public static String urlEncode(String data) {
+    public static String urlEncode(String data, String encoding) {
         try {
-            return URLEncoder.encode(data, "UTF-8");
+            return URLEncoder.encode(data, encoding);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "";

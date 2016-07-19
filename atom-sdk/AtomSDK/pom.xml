@@ -54,6 +54,9 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
+                            <exclude>**/Response.class</exclude>
+                            <exclude>**/IronSourceAtom.class</exclude>
+                            <exclude>**/HttpMethod.class</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
