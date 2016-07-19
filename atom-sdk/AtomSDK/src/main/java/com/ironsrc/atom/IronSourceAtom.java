@@ -82,7 +82,7 @@ public class IronSourceAtom {
      * @param data user data to send
      * @param authKey auth key for stream
      * @param method for POST or GET method for do request
-     * @return
+     * @return response from server
      */
     public Response putEvent(String stream, String data, String authKey, HttpMethod method) {
         if (authKey.length() == 0) {
@@ -202,7 +202,7 @@ public class IronSourceAtom {
      * @param method for POST or GET method
      * @param headers headers data for request
      * @param data for request data
-     * @return
+     * @return response from server
      */
     protected Response sendEvent(String url, HttpMethod method, HashMap<String, String> headers,
                                  String data) {
@@ -212,8 +212,8 @@ public class IronSourceAtom {
     }
 
     /**
-     *
-     * @param logData
+     * Prints the log.
+     * @param logData  print debug data
      */
     protected void printLog(String logData) {
         if (isDebug_) {
