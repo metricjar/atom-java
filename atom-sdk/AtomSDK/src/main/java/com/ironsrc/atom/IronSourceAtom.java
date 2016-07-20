@@ -186,7 +186,7 @@ public class IronSourceAtom {
         String hash = "";
         if (authKey.length() > 0) {
             hash = Utils.encodeHmac(data, authKey);
-        } 
+        }
 
 
         HashMap<String, String> eventObject = new HashMap<String, String>();

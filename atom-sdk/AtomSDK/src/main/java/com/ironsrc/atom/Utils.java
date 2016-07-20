@@ -91,4 +91,12 @@ public class Utils {
             return "";
         }
     }
+
+    /**
+     * Get the current milliseconds.
+     * @return current milliseconds
+     */
+    public static long getCurrentMilliseconds() {
+        return System.currentTimeMillis();
+    }
 }
