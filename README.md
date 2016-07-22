@@ -12,6 +12,66 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Sending an event](#Using-the-IronSource-API-to-send-events)
 
 #### Using the IronSource API to send events 
+##### Tracker usage
+Example of track an event in Java:
+```java
+IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+tracker_.enableDebug(true);
+tracker_.setAuth("<YOUR_AUTH_KEY>");
+
+// set event pool size and worker threads count
+tracker_.setTaskPoolSize(1000);
+tracker_.setTaskWorkersCount(24);
+
+// set bulk size and flush intervall
+tracker_.setBulkSize(4);
+tracker_.setFlushInterval(2000);
+tracker_.setEndpoint("http://track.atom-data.io/");
+
+String dataTrack = "{\"strings\": \"data track\"}";
+// add data to queue
+tracker_.track("<YOUR_STREAM_NAME>", dataTrack, "<YOUR_AUTH_KEY>");
+
+// send data with default key that was initiated with method setAuth 
+tracker_.track("<YOUR_STREAM_NAME>", dataTrack);
+
+// hard flush all data in queue
+tracker_.flush();
+
+// stops all workers in task pool
+tracker_.stop();
+```
+
+##### Interface for store data `IEventManager`.
+Implementation must to be synchronized for multithreading use.
+```java
+/**
+ * Interface for store data
+ */
+public interface IEventManager {
+
+    /**
+     * Add the event.
+     * @param eventObject event data object
+     */
+    public void addEvent(Event eventObject);
+
+    /**
+     * Get one the event from store.
+     * @param stream name of the stream
+     * @return event object
+     */
+    public Event getEvent(String stream);
+}
+```
+Using custom storage implementation:
+```java
+IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+
+IEventManager customEventManager = new QueueEventManager();
+tracker_.setEventManager(customEventManager);
+```
+
 ##### Low level API usage
 Example of sending an event in Java:
 ```java

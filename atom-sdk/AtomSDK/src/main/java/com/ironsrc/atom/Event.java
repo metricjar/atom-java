@@ -3,6 +3,9 @@
  */
 package com.ironsrc.atom;
 
+/**
+ * Holds event data (stream name, data itself and auth key for stream)
+ */
 public class Event {
     public String data_;
     public String stream_;

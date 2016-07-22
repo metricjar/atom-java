@@ -21,7 +21,7 @@ public class EventTaskPool {
      */
     public EventTaskPool(int maxThreads, int maxEvents) {
         maxEvents_ = maxEvents;
-        //events_ = new ConcurrentQueue<Action>();
+        events_ = new ConcurrentLinkedQueue<EventTask>();
         isRunning_ = true;
 
         workers_ = new LinkedList<Thread>();
@@ -55,7 +55,7 @@ public class EventTaskPool {
     private void taskWorker() {
         while (isRunning_) {
             EventTask eventTask = events_.poll();
-            if (eventTask != null) {
+            if (eventTask == null) {
                 try {
                     Thread.sleep(25);
                 } catch (InterruptedException ex) {

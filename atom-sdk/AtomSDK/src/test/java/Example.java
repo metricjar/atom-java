@@ -1,12 +1,66 @@
-import com.ironsrc.atom.HttpMethod;
-import com.ironsrc.atom.IronSourceAtom;
-import com.ironsrc.atom.Response;
-import com.ironsrc.atom.Utils;
+import com.ironsrc.atom.*;
 
 import java.util.LinkedList;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Example {
+    static Boolean isRunThreads = true;
+    static AtomicInteger requestIndex = new AtomicInteger(0);
+
+    static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+
     public static void main(String [] args) {
+        /**
+         * Example of using high level API
+         */
+        tracker_.enableDebug(true);
+        tracker_.setAuth("");
+
+        // set event pool size and worker threads count
+        tracker_.setTaskPoolSize(1000);
+        tracker_.setTaskWorkersCount(24);
+
+        // test for bulk size
+       // tracker_.setBulkBytesSize(2);
+        tracker_.setBulkSize(4);
+        tracker_.setFlushInterval(2000);
+        tracker_.setEndpoint("http://track.atom-data.io/");
+
+        for (int i = 0; i < 5; ++i) {
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    while (isRunThreads) {
+                        String data = "{\"strings\": \"d: " + requestIndex.incrementAndGet() +
+                                " t: " + Thread.currentThread().getId() + "\"}";
+
+                        tracker_.track("ibtest", data, "");
+
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ex) {
+                        }
+
+                        if (requestIndex.get() >= 34) {
+                            isRunThreads = false;
+                        }
+                    }
+                }
+            });
+
+            thread.start();
+        }
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+        }
+
+        tracker_.stop();
+
+        /**
+         * Example of using low level API
+         */
         IronSourceAtom api_ = new IronSourceAtom();
 
         api_.enableDebug(true);

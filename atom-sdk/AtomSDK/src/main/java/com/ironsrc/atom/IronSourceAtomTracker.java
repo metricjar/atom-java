@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Iron source atom tracker.
+ * ironSource Atom high level API class, support track() and flush()
  */
 public class IronSourceAtomTracker {
     private static String TAG_ = "IronSourceAtomTracker";
@@ -38,8 +38,8 @@ public class IronSourceAtomTracker {
 
     private IronSourceAtom api_;
 
-    private Boolean isDebug_;
-    private Boolean isFlushData_;
+    private Boolean isDebug_ = false;
+    private Boolean isFlushData_ = false;
 
 
     private Boolean isRunWorker_ = true;
@@ -74,7 +74,7 @@ public class IronSourceAtomTracker {
     /**
      * Clear craeted IronSourceCoroutineHandler
      */
-    public void Stop() {
+    public void stop() {
         isRunWorker_ = false;
         eventPool_.stop();
     }
@@ -83,7 +83,7 @@ public class IronSourceAtomTracker {
      * Sets the size of the task pool.
      * @param taskPoolSize task pool size
      */
-    public void SetTaskPoolSize(int taskPoolSize) {
+    public void setTaskPoolSize(int taskPoolSize) {
         taskPoolSize_ = taskPoolSize;
     }
 
@@ -91,7 +91,7 @@ public class IronSourceAtomTracker {
      * Sets the task workers count.
      * @param taskWorkersCount task workers count
      */
-    public void SetTaskWorkersCount(int taskWorkersCount) {
+    public void setTaskWorkersCount(int taskWorkersCount) {
         taskWorkersCount_ = taskWorkersCount;
     }
 
@@ -99,7 +99,7 @@ public class IronSourceAtomTracker {
      * Sets the event manager.
      * @param eventManager custom event manager
      */
-    public void SetEventManager(IEventManager eventManager) {
+    public void setEventManager(IEventManager eventManager) {
         eventManager_ = eventManager;
     }
 
@@ -107,7 +107,7 @@ public class IronSourceAtomTracker {
      * Enabling print debug information
      * @param isDebug If set to true is debug.
      */
-    public void EnableDebug(Boolean isDebug) {
+    public void enableDebug(Boolean isDebug) {
         isDebug_ = isDebug;
 
         api_.enableDebug(isDebug);
@@ -117,7 +117,7 @@ public class IronSourceAtomTracker {
      * Set Auth Key for stream
      * @param authKey for secret key of stream.
      */
-    public void SetAuth(String authKey) {
+    public void setAuth(String authKey) {
         api_.setAuth(authKey);
     }
 
@@ -125,7 +125,7 @@ public class IronSourceAtomTracker {
      * Set endpoint for send data
      * @param endpoint for address of server
      */
-    public void SetEndpoint(String endpoint) {
+    public void setEndpoint(String endpoint) {
         api_.setEndpoint(endpoint);
     }
 
@@ -133,7 +133,7 @@ public class IronSourceAtomTracker {
      * Set Bulk data count
      * @param bulkSize count of event for flush
      */
-    public void SetBulkSize(int bulkSize) {
+    public void setBulkSize(int bulkSize) {
         bulkSize_ = bulkSize;
     }
 
@@ -141,7 +141,7 @@ public class IronSourceAtomTracker {
      * Set Bult data bytes size
      * @param bulkBytesSize size in bytes
      */
-    public void SetBulkBytesSize(int bulkBytesSize) {
+    public void setBulkBytesSize(int bulkBytesSize) {
         bulkBytesSize_ = bulkBytesSize;
     }
 
@@ -149,7 +149,7 @@ public class IronSourceAtomTracker {
      * Set intervals for flushing data
      * @param flushInterval intervals in seconds
      */
-    public void SetFlushInterval(long flushInterval) {
+    public void setFlushInterval(long flushInterval) {
         flushInterval_ = flushInterval;
     }
 
@@ -159,7 +159,7 @@ public class IronSourceAtomTracker {
      * @param data info for sending
      * @param authKey secret token for stream
      */
-    public void Track(String stream, String data, String authKey) {
+    public void track(String stream, String data, String authKey) {
         if (authKey.length() == 0) {
             authKey = api_.getAuth();
         }
@@ -172,9 +172,18 @@ public class IronSourceAtomTracker {
     }
 
     /**
+     * Track data to server
+     * @param stream name of the stream
+     * @param data info for sending
+     */
+    public void track(String stream, String data) {
+        this.track(stream, data, api_.getAuth());
+    }
+
+    /**
      * Flush all data to server
      */
-    public void Flush() {
+    public void flush() {
         isFlushData_ = true;
     }
 
@@ -183,7 +192,7 @@ public class IronSourceAtomTracker {
      * @param attempt attempt count
      * @return duration
      */
-    private double GetDuration(int attempt) {
+    private double getDuration(int attempt) {
         double duration = minTime_ * Math.pow(2, attempt);
         duration = (random_.nextDouble() * (duration - minTime_)) + minTime_;
 
@@ -197,12 +206,10 @@ public class IronSourceAtomTracker {
     private void flushEvent(String stream, String authKey, LinkedList<String> events) {
         LinkedList<String> buffer = new LinkedList<String>(events);
         events.clear();
-        //eventsSize.put(stream, 0);
-       // timerDeltaTime = 0;
 
         eventPool_.addEvent(new EventTask(stream, authKey, buffer) {
             public void action() {
-                FlushData(this.stream_, this.authKey_, this.buffer_);
+                flushData(this.stream_, this.authKey_, this.buffer_);
             }
         });
     }
@@ -283,7 +290,7 @@ public class IronSourceAtomTracker {
      * @param authKey secret key for stream
      * @param data for sending to server
      */
-    private void FlushData(String stream, String authKey, LinkedList<String> data) {
+    private void flushData(String stream, String authKey, LinkedList<String> data) {
         int attempt = 1;
 
         while (true) {
@@ -293,7 +300,7 @@ public class IronSourceAtomTracker {
                 break;
             }
 
-            int duration = (int)(GetDuration(attempt++) * 1000);
+            int duration = (int)(getDuration(attempt++) * 1000);
             try {
                 Thread.sleep(duration);
             } catch (InterruptedException ex) {
@@ -309,7 +316,9 @@ public class IronSourceAtomTracker {
      */
     protected void printLog(String logData) {
         if (isDebug_) {
-            System.out.println(TAG_ + ": " + logData);
+            synchronized (System.out) {
+                System.out.println(TAG_ + ": " + logData);
+            }
         }
     }
 }

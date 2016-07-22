@@ -13,6 +13,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 
+/**
+ * Custom utils method for converting data, encrypt and etc.
+ */
 public class Utils {
     /**
      * Convert Object to json string
