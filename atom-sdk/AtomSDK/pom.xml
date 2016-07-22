@@ -55,9 +55,9 @@
                         <excludes>
                             <exclude>**/Request.class</exclude>
                             <exclude>**/IronSourceAtom.class</exclude>
-                            <exclude>**/IronSourceAtomTracker.class</exclude>
+                            <exclude>**/*Tracker.class</exclude>
                             <exclude>**/EventTask.class</exclude>
-                            <exclude>**/EventTaskPool.class</exclude>
+                            <exclude>**/*Pool.class</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
                     </instrumentation>
