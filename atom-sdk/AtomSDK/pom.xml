@@ -54,8 +54,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
-                            <exclude>**/IronSourceAtomTracker.class</exclude>
-                            <exclude>**/IronSourceAtom.class</exclude>
+                            <exclude>**/*Atom*</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
                     </instrumentation>
