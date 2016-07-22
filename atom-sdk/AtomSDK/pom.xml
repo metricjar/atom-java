@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.4</version>
                 <configuration>
                     <check>true</check>
                     <format>xml</format>
@@ -54,6 +54,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
+                            <exclude>**/EventTask*</exclude>
                             <exclude>**/*Atom*</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
