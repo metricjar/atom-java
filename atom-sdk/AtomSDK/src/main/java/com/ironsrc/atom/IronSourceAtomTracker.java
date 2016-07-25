@@ -218,8 +218,8 @@ public class IronSourceAtomTracker {
      * Events the worker.
      */
     private void eventWorker() {
-        long timerStartTime = Utils.getCurrentMilliseconds();
-        long timerDeltaTime = 0;
+        HashMap<String, Long> timerStartTime = new HashMap<String, Long>();
+        HashMap<String, Long> timerDeltaTime = new HashMap<String, Long>();
 
         // temporary buffers for hold event data per stream
         HashMap<String, LinkedList<String>> eventsBuffer = new HashMap<String, LinkedList<String>>();
@@ -230,10 +230,26 @@ public class IronSourceAtomTracker {
 
         while (isRunWorker_) {
             for (Map.Entry<String, String> entry : streamData_.entrySet()) {
-                timerDeltaTime += Utils.getCurrentMilliseconds() - timerStartTime;
-                timerStartTime = Utils.getCurrentMilliseconds();
-
                 String streamName = entry.getKey();
+                if (!timerStartTime.containsKey(streamName)) {
+                    timerStartTime.put(streamName, Utils.getCurrentMilliseconds());
+                }
+
+                if (!timerDeltaTime.containsKey(streamName)) {
+                    timerDeltaTime.put(streamName, 0L);
+                }
+
+                timerDeltaTime.put(streamName, timerDeltaTime.get(streamName) +
+                        (Utils.getCurrentMilliseconds() - timerStartTime.get(streamName)));
+                timerStartTime.put(streamName, Utils.getCurrentMilliseconds());
+
+                if (timerDeltaTime.get(streamName) >= flushInterval_) {
+                    if (eventsBuffer.get(streamName).size() > 0) {
+                        flushEvent(streamName, streamData_.get(streamName), eventsBuffer.get(streamName));
+                        eventsSize.put(streamName, 0);
+                    }
+                    timerDeltaTime.put(streamName, 0L);
+                }
 
                 Event eventObject = eventManager_.getEvent(streamName);
                 if (eventObject == null) {
@@ -267,14 +283,9 @@ public class IronSourceAtomTracker {
                     isClearSize = true;
                 }
 
-                if (timerDeltaTime >= flushInterval_) {
-                    flushEvent(streamName, streamData_.get(streamName), eventsBuffer.get(streamName));
-                    isClearSize = true;
-                }
-
                 if (isClearSize) {
                     eventsSize.put(streamName, 0);
-                    timerDeltaTime = 0;
+                    timerDeltaTime.put(streamName, 0L);
                 }
             }
 
@@ -295,7 +306,7 @@ public class IronSourceAtomTracker {
 
         while (true) {
             Response response = api_.putEvents(stream, data, authKey);
-            printLog("data: " + data + "; response: " + response.status);
+            printLog("stream: " + stream + "; response: " + response.status);
             if (response.status < 500 && response.status > 1) {
                 break;
             }

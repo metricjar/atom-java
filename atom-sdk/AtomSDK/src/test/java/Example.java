@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Example {
     static Boolean isRunThreads = true;
     static AtomicInteger requestIndex = new AtomicInteger(0);
+    static int threadIndex;
 
     static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
 
@@ -23,21 +24,27 @@ public class Example {
 
         // test for bulk size
        // tracker_.setBulkBytesSize(2);
-        tracker_.setBulkSize(4);
+        //tracker_.setBulkSize(4);
         tracker_.setFlushInterval(2000);
         tracker_.setEndpoint("http://track.atom-data.io/");
 
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 10; ++i) {
+            threadIndex = i;
             Thread thread = new Thread(new Runnable() {
                 public void run() {
+                    int index = threadIndex;
                     while (isRunThreads) {
                         String data = "{\"strings\": \"d: " + requestIndex.incrementAndGet() +
                                 " t: " + Thread.currentThread().getId() + "\"}";
 
-                        tracker_.track("ibtest", data, "");
+                        if (index < 5) {
+                            tracker_.track("ibtest", data, "");
+                        } else {
+                            tracker_.track("ibtest2", data, "");
+                        }
 
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(2000);
                         } catch (InterruptedException ex) {
                         }
 
