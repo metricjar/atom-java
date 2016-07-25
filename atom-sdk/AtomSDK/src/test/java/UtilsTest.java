@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-
-
 public class UtilsTest {
     @Test
     public void testObjectToJson() {
@@ -96,5 +94,17 @@ public class UtilsTest {
         String resultData = Utils.urlEncode(testData, "UTF-81");
 
         Assert.assertEquals(expectedStr, resultData);
+    }
+
+    @Test
+    public void testGetCurrentMilliseconds() {
+        long expectedTime = Utils.getCurrentMilliseconds();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+        }
+
+        Assert.assertNotEquals(expectedTime, Utils.getCurrentMilliseconds());
     }
 }
