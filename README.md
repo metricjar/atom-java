@@ -30,7 +30,7 @@ and add dependency for Atom SDK
 ```xml
     <dependencies>
         <dependency>
-            <groupId>com.ironsource.atom</groupId>
+            <groupId>com.ironsrc.atom</groupId>
             <artifactId>atom-sdk</artifactId>
             <version>1.1.0</version>
         </dependency>

@@ -12,7 +12,7 @@
         <github.global.server>github</github.global.server>
     </properties>
 
-    <groupId>com.ironsource.atom</groupId>
+    <groupId>com.ironsrc.atom</groupId>
     <artifactId>atom-sdk</artifactId>
     <version>1.1.0</version>
     <dependencies>

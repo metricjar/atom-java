@@ -1,11 +1,10 @@
 /**
  * Created by g8y3e on 7/18/16.
  */
-import com.ironsource.atom.Utils;
+import com.ironsrc.atom.Utils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
