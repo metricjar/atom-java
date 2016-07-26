@@ -12,29 +12,44 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Documentation](https://ironsource.github.io/atom-java/)
 - [Sending an event](#Using-the-IronSource-API-to-send-events)
 
-## Installation
+## Instalation for Gradle Project
+Add repository for you gradle config file
+```json
+repositories {
+   maven { url "https://raw.github.com/ironSource/atom-java/mvn-repo/" }
+}
+
+```
+and add dependency for Atom SDK
+```json
+dependencies {
+   compile 'com.ironsrc.atom:atom-sdk:1.1.0'
+}
+```
+
+## Installation for Maven Project
 Add repository for you pom.xml
 ```xml
-    <repositories>
-        <repository>
-            <id>atom-java</id>
-            <url>https://raw.github.com/ironSoure/atom-java/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
+<repositories>
+    <repository>
+        <id>atom-java</id>
+        <url>https://raw.github.com/ironSource/atom-java/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
 ```
 and add dependency for Atom SDK
 ```xml
-    <dependencies>
-        <dependency>
-            <groupId>com.ironsrc.atom</groupId>
-            <artifactId>atom-sdk</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-    </dependencies>
+<dependencies>
+    <dependency>
+        <groupId>com.ironsrc.atom</groupId>
+        <artifactId>atom-sdk</artifactId>
+        <version>1.1.0</version>
+    </dependency>
+</dependencies>
 ```
 
 ## Using the IronSource API to send events 
