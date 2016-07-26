@@ -70,7 +70,7 @@ public class IronSourceAtomTracker {
     }
 
     /**
-     * Clear craeted IronSourceCoroutineHandler
+     * Stop all event pool threads
      */
     public void stop() {
         isRunWorker_ = false;
