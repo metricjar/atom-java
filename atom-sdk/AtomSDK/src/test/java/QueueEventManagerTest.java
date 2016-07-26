@@ -1,9 +1,9 @@
 /**
  * Created by g8y3e on 7/22/16.
  */
-import com.ironsrc.atom.Event;
-import com.ironsrc.atom.IEventManager;
-import com.ironsrc.atom.QueueEventManager;
+import com.ironsource.atom.Event;
+import com.ironsource.atom.IEventManager;
+import com.ironsource.atom.QueueEventManager;
 import org.junit.Assert;
 import org.junit.Test;
 

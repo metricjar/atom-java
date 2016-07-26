@@ -2,7 +2,7 @@
  * Created by g8y3e on 7/22/16.
  */
 
-import com.ironsrc.atom.Event;
+import com.ironsource.atom.Event;
 import org.junit.Assert;
 import org.junit.Test;
 

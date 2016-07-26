@@ -1,7 +1,7 @@
 /**
  * Created by g8y3e on 7/22/16.
  */
-import com.ironsrc.atom.Response;
+import com.ironsource.atom.Response;
 import org.junit.Assert;
 import org.junit.Test;
 
