@@ -38,7 +38,7 @@ and add dependency for Atom SDK
 ```
 
 ## Using the IronSource API to send events 
-##### Tracker usage
+### Tracker usage
 Example of track an event in Java:
 ```java
 IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
@@ -68,7 +68,7 @@ tracker_.flush();
 tracker_.stop();
 ```
 
-##### Interface for store data `IEventManager`.
+### Interface for store data `IEventManager`.
 Implementation must to be synchronized for multithreading use.
 ```java
 /**
@@ -98,7 +98,7 @@ IEventManager customEventManager = new QueueEventManager();
 tracker_.setEventManager(customEventManager);
 ```
 
-##### Low level API usage
+### Low level API usage
 Example of sending an event in Java:
 ```java
 IronSourceAtom api_ = new IronSourceAtom();
