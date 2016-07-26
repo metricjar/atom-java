@@ -4,6 +4,7 @@
 [![Docs][docs-image]][docs-url]
 [![Build status][travis-image]][travis-url]
 [![Coverage Status][coverage-image]][coverage-url]
+[![Maven Status][maven-image]][maven-url]
 
 atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-management) SDK for Java.
 
@@ -11,7 +12,32 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Documentation](https://ironsource.github.io/atom-java/)
 - [Sending an event](#Using-the-IronSource-API-to-send-events)
 
-#### Using the IronSource API to send events 
+## Installation
+Add repository for you pom.xml
+```xml
+    <repositories>
+        <repository>
+            <id>atom-java</id>
+            <url>https://raw.github.com/ironSoure/atom-java/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+```
+and add dependency for Atom SDK
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>com.ironsource.atom</groupId>
+            <artifactId>atom-sdk</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+    </dependencies>
+```
+
+## Using the IronSource API to send events 
 ##### Tracker usage
 Example of track an event in Java:
 ```java
@@ -105,7 +131,7 @@ Response responseBulk = api_.putEvents(streamBulk, dataBulk);
 
 System.out.println("Data: " + responseBulk.data);
 ```
-### License
+## License
 MIT
 
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
@@ -116,3 +142,5 @@ MIT
 [travis-url]: https://travis-ci.org/ironSource/atom-java
 [coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
+[maven-image]: https://img.shields.io/badge/maven%20build-v1.1.0-green.svg
+[maven-url]: https://github.com/ironSource/atom-java/tree/mvn-repo
