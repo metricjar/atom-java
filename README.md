@@ -14,14 +14,14 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 
 ## Instalation for Gradle Project
 Add repository for you gradle config file
-```json
+```java
 repositories {
    maven { url "https://raw.github.com/ironSource/atom-java/mvn-repo/" }
 }
 
 ```
 and add dependency for Atom SDK
-```json
+```java
 dependencies {
    compile 'com.ironsrc.atom:atom-sdk:1.1.0'
 }
