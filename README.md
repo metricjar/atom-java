@@ -4,6 +4,7 @@
 [![Docs][docs-image]][docs-url]
 [![Build status][travis-image]][travis-url]
 [![Coverage Status][coverage-image]][coverage-url]
+[![Maven Status][maven-image]][maven-url]
 
 atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-management) SDK for Java.
 
@@ -11,8 +12,108 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Documentation](https://ironsource.github.io/atom-java/)
 - [Sending an event](#Using-the-IronSource-API-to-send-events)
 
-#### Using the IronSource API to send events 
-##### Low level API usage
+## Instalation for Gradle Project
+Add repository for you gradle config file
+```java
+repositories {
+   maven { url "https://raw.github.com/ironSource/atom-java/mvn-repo/" }
+}
+
+```
+and add dependency for Atom SDK
+```java
+dependencies {
+   compile 'com.ironsrc.atom:atom-sdk:1.1.0'
+}
+```
+
+## Installation for Maven Project
+Add repository for you pom.xml
+```xml
+<repositories>
+    <repository>
+        <id>atom-java</id>
+        <url>https://raw.github.com/ironSource/atom-java/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
+```
+and add dependency for Atom SDK
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.ironsrc.atom</groupId>
+        <artifactId>atom-sdk</artifactId>
+        <version>1.1.0</version>
+    </dependency>
+</dependencies>
+```
+
+## Using the IronSource API to send events 
+### Tracker usage
+Example of track an event in Java:
+```java
+IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+tracker_.enableDebug(true);
+tracker_.setAuth("<YOUR_AUTH_KEY>");
+
+// set event pool size and worker threads count
+tracker_.setTaskPoolSize(1000);
+tracker_.setTaskWorkersCount(24);
+
+// set bulk size and flush intervall
+tracker_.setBulkSize(4);
+tracker_.setFlushInterval(2000);
+tracker_.setEndpoint("http://track.atom-data.io/");
+
+String dataTrack = "{\"strings\": \"data track\"}";
+// add data to queue
+tracker_.track("<YOUR_STREAM_NAME>", dataTrack, "<YOUR_AUTH_KEY>");
+
+// send data with default key that was initiated with method setAuth 
+tracker_.track("<YOUR_STREAM_NAME>", dataTrack);
+
+// hard flush all data in queue
+tracker_.flush();
+
+// stops all workers in task pool
+tracker_.stop();
+```
+
+### Interface for store data `IEventManager`.
+Implementation must to be synchronized for multithreading use.
+```java
+/**
+ * Interface for store data
+ */
+public interface IEventManager {
+
+    /**
+     * Add the event.
+     * @param eventObject event data object
+     */
+    public void addEvent(Event eventObject);
+
+    /**
+     * Get one the event from store.
+     * @param stream name of the stream
+     * @return event object
+     */
+    public Event getEvent(String stream);
+}
+```
+Using custom storage implementation:
+```java
+IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+
+IEventManager customEventManager = new QueueEventManager();
+tracker_.setEventManager(customEventManager);
+```
+
+### Low level API usage
 Example of sending an event in Java:
 ```java
 IronSourceAtom api_ = new IronSourceAtom();
@@ -45,10 +146,10 @@ Response responseBulk = api_.putEvents(streamBulk, dataBulk);
 
 System.out.println("Data: " + responseBulk.data);
 ```
-### License
+## License
 MIT
 
-[license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+[license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE
 [docs-image]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-url]: https://ironsource.github.io/atom-java/
@@ -56,3 +157,5 @@ MIT
 [travis-url]: https://travis-ci.org/ironSource/atom-java
 [coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
+[maven-image]: https://img.shields.io/badge/maven%20build-v1.1.0-green.svg
+[maven-url]: https://github.com/ironSource/atom-java/tree/mvn-repo

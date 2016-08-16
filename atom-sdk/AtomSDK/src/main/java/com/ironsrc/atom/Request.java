@@ -12,6 +12,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * For send HTTP requests to server
+ */
 public class Request {
     private static String TAG_ = "Request";
 
@@ -151,9 +154,13 @@ public class Request {
 
     /**
      * Prints the log.
-     * @param data print debug data
+     * @param logData print debug data
      */
-    protected void printLog(String data) {
-        System.out.println(TAG_ + ": " + data);
+    protected void printLog(String logData) {
+        if (isDebug_) {
+            synchronized (System.out) {
+                System.out.println(TAG_ + ": " + logData);
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * ironSource Atom low level API class, supports putEvent() and putEvents();
+ * ironSource Atom low level API class, supports putEvent() and putEvents()
  */
 public class IronSourceAtom {
     private static String TAG_ = "IronSourceAtom";
@@ -223,7 +223,9 @@ public class IronSourceAtom {
      */
     protected void printLog(String logData) {
         if (isDebug_) {
-            System.out.println(TAG_ + ": " + logData);
+            synchronized (System.out) {
+                System.out.println(TAG_ + ": " + logData);
+            }
         }
     }
 }

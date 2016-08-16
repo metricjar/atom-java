@@ -13,6 +13,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 
+/**
+ * Custom utils method for converting data, encrypt and etc.
+ */
 public class Utils {
     /**
      * Convert Object to json string
@@ -90,5 +93,13 @@ public class Utils {
             e.printStackTrace();
             return "";
         }
+    }
+
+    /**
+     * Get the current milliseconds.
+     * @return current milliseconds
+     */
+    public static long getCurrentMilliseconds() {
+        return System.currentTimeMillis();
     }
 }

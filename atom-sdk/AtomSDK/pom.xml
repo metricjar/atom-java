@@ -8,16 +8,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.jacoco.version>0.7.6.201602180812</maven.jacoco.version>
         <maven.cobertura.version>2.7</maven.cobertura.version>
+        <!-- github server corresponds to entry in ~/.m2/settings.xml -->
+        <github.global.server>github</github.global.server>
     </properties>
 
     <groupId>com.ironsrc.atom</groupId>
     <artifactId>atom-sdk</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -32,8 +35,48 @@
     </dependencies>
 
 
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.11</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+                    <includes><include>**/*</include></includes>
+                    <repositoryName>atom-java</repositoryName>      <!-- github repo name -->
+                    <repositoryOwner>ironSource</repositoryOwner>    <!-- github username  -->
+                </configuration>
+                <executions>
+                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -54,8 +97,8 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
-                            <exclude>**/Response.class</exclude>
-                            <exclude>**/IronSourceAtom.class</exclude>
+                            <exclude>**/EventTask*</exclude>
+                            <exclude>**/*Atom*</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
                     </instrumentation>
