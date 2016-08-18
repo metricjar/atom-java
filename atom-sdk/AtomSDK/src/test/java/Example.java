@@ -17,10 +17,6 @@ public class Example {
         tracker_.enableDebug(true);
         tracker_.setAuth("");
 
-        // set event pool size and worker threads count
-        tracker_.setTaskPoolSize(1000);
-        tracker_.setTaskWorkersCount(24);
-
         // test for bulk size
        // tracker_.setBulkBytesSize(2);
         //tracker_.setBulkSize(4);

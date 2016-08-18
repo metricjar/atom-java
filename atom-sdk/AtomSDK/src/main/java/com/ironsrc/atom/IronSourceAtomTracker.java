@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IronSourceAtomTracker {
     private static String TAG_ = "IronSourceAtomTracker";
 
-    private int taskWorkersCount_ = 24;
-    private int taskPoolSize_ = 10000;
+    private static int TASK_WORKER_COUNT_ = 24;
+    private static int TASK_POOL_SIZE_ = 10000;
 
     /**
      * The flush interval in milliseconds
@@ -53,8 +53,17 @@ public class IronSourceAtomTracker {
      * API Tracker constructor
      */
     public IronSourceAtomTracker() {
+        this(TASK_WORKER_COUNT_, TASK_POOL_SIZE_);
+    }
+
+    /**
+     * API Tracker constructor
+     * @param taskWorkersCount worker count
+     * @param taskPoolSize set pool size
+     */
+    public IronSourceAtomTracker(int taskWorkersCount, int taskPoolSize) {
         api_ = new IronSourceAtom();
-        eventPool_ = new EventTaskPool(taskWorkersCount_, taskPoolSize_);
+        eventPool_ = new EventTaskPool(taskWorkersCount, taskPoolSize);
 
         eventManager_ = new QueueEventManager();
         streamData_ = new ConcurrentHashMap<String, String>();
@@ -75,22 +84,6 @@ public class IronSourceAtomTracker {
     public void stop() {
         isRunWorker_ = false;
         eventPool_.stop();
-    }
-
-    /**
-     * Sets the size of the task pool.
-     * @param taskPoolSize task pool size
-     */
-    public void setTaskPoolSize(int taskPoolSize) {
-        taskPoolSize_ = taskPoolSize;
-    }
-
-    /**
-     * Sets the task workers count.
-     * @param taskWorkersCount task workers count
-     */
-    public void setTaskWorkersCount(int taskWorkersCount) {
-        taskWorkersCount_ = taskWorkersCount;
     }
 
     /**
