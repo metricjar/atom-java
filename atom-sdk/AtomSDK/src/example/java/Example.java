@@ -1,4 +1,5 @@
 import com.ironsrc.atom.*;
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,8 +19,8 @@ public class Example {
         tracker_.setAuth("");
 
         // test for bulk size
-       // tracker_.setBulkBytesSize(2);
-        //tracker_.setBulkSize(4);
+        tracker_.setBulkBytesSize(2);
+        tracker_.setBulkSize(4);
         tracker_.setFlushInterval(2000);
         tracker_.setEndpoint("http://track.atom-data.io/");
 
@@ -29,13 +30,13 @@ public class Example {
                 public void run() {
                     int index = threadIndex;
                     while (isRunThreads) {
-                        String data = "{\"strings\": \"d: " + requestIndex.incrementAndGet() +
-                                " t: " + Thread.currentThread().getId() + "\"}";
-
+                        String eventData = "d: " + requestIndex.incrementAndGet() +
+                                " t: " + Thread.currentThread().getId();
+                        JSONObject eventJson = new JSONObject().put("strings", eventData);
                         if (index < 5) {
-                            tracker_.track("ibtest", data, "");
+                            tracker_.track("ibtest", eventJson.toString(), "");
                         } else {
-                            tracker_.track("ibtest2", data, "");
+                            tracker_.track("ibtest2", eventJson.toString(), "");
                         }
 
                         try {
@@ -70,41 +71,53 @@ public class Example {
 
         String streamGet = "ibtest";
         String authKey = "";
-        String dataGet = "{\"strings\": \"data GET\"}";
 
-        Response responseGet = api_.putEvent(streamGet, dataGet, authKey, HttpMethod.GET);
+        JSONObject dataGet = new JSONObject().put("strings", "data GET");
+        Response responseGet = api_.putEvent(streamGet, dataGet.toString(), authKey, HttpMethod.GET);
 
         System.out.println("Data: " + responseGet.data + "; Status: " + responseGet.status +
                            "; Error: " + responseGet.error);
 
         String streamPost = "ibtest";
         String authKeyPost = "";
-        String dataPost = "{\"strings\": \"data POST\"}";
 
-        Response responsePost = api_.putEvent(streamPost, dataPost, authKeyPost, HttpMethod.POST);
+        JSONObject dataPost = new JSONObject().put("strings", "data POST");
+        Response responsePost = api_.putEvent(streamPost, dataPost.toString(), authKeyPost, HttpMethod.POST);
 
         System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status +
                            "; Error: " + responsePost.error);
 
         String streamBulk = "ibtest";
-        LinkedList<String> dataBulk = new LinkedList<String>();
-        dataBulk.add("{\"strings\": \"test BULK 1\"}");
-        dataBulk.add("{\"strings\": \"test BULK 2\"}");
-        dataBulk.add("{\"strings\": \"test BULK 3\"}");
+        LinkedList<String> dataBulkList1 = new LinkedList<String>();
+
+        JSONObject dataBulk1 = new JSONObject().put("strings", "test BULK 1");
+        dataBulkList1.add(dataBulk1.toString());
+
+        JSONObject dataBulk2 = new JSONObject().put("strings", "test BULK 2");
+        dataBulkList1.add(dataBulk2.toString());
+
+        JSONObject dataBulk3 = new JSONObject().put("strings", "test BULK 3");
+        dataBulkList1.add(dataBulk3.toString());
 
         api_.setAuth("");
 
-        Response responseBulk = api_.putEvents(streamBulk, dataBulk);
+        Response responseBulk = api_.putEvents(streamBulk, dataBulkList1);
 
         System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status +
                            "; Error: " + responseBulk.error);
 
-        LinkedList<String> dataBulk2 = new LinkedList<String>();
-        dataBulk2.add("{\"strings\": \"test BULK 1 1\"}");
-        dataBulk2.add("{\"strings\": \"test BULK 1 2\"}");
-        dataBulk2.add("{\"strings\": \"test BULK 1 3\"}");
+        LinkedList<String> dataBulkList2 = new LinkedList<String>();
 
-        Response responseBulk2 = api_.putEvents(streamBulk, Utils.listToJson(dataBulk2));
+        dataBulk1 = new JSONObject().put("strings", "test BULK 1 1");
+        dataBulkList2.add(dataBulk1.toString());
+
+        dataBulk2 = new JSONObject().put("strings", "test BULK 1 2");
+        dataBulkList2.add(dataBulk2.toString());
+
+        dataBulk3 = new JSONObject().put("strings", "test BULK 1 3");
+        dataBulkList2.add(dataBulk3.toString());
+
+        Response responseBulk2 = api_.putEvents(streamBulk, Utils.listToJson(dataBulkList2));
 
         System.out.println("Data: " + responseBulk2.data + "; Status: " + responseBulk2.status +
                            "; Error: " + responseBulk2.error);
