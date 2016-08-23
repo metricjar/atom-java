@@ -1,6 +1,7 @@
+import com.google.gson.Gson;
 import com.ironsrc.atom.*;
-import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,11 +33,13 @@ public class Example {
                     while (isRunThreads) {
                         String eventData = "d: " + requestIndex.incrementAndGet() +
                                 " t: " + Thread.currentThread().getId();
-                        JSONObject eventJson = new JSONObject().put("strings", eventData);
+
+                        HashMap<String, String> eventJson = new HashMap<String, String>();
+                        eventJson.put("strings",eventData);
                         if (index < 5) {
-                            tracker_.track("ibtest", eventJson.toString(), "");
+                            tracker_.track("ibtest", new Gson().toJson(eventJson), "");
                         } else {
-                            tracker_.track("ibtest2", eventJson.toString(), "");
+                            tracker_.track("ibtest2", new Gson().toJson(eventJson), "");
                         }
 
                         try {
@@ -72,8 +75,9 @@ public class Example {
         String streamGet = "ibtest";
         String authKey = "";
 
-        JSONObject dataGet = new JSONObject().put("strings", "data GET");
-        Response responseGet = api_.putEvent(streamGet, dataGet.toString(), authKey, HttpMethod.GET);
+        HashMap<String, String> dataGet = new HashMap<String, String>();
+        dataGet.put("strings", "data GET");
+        Response responseGet = api_.putEvent(streamGet, new Gson().toJson(dataGet), authKey, HttpMethod.GET);
 
         System.out.println("Data: " + responseGet.data + "; Status: " + responseGet.status +
                            "; Error: " + responseGet.error);
@@ -81,8 +85,9 @@ public class Example {
         String streamPost = "ibtest";
         String authKeyPost = "";
 
-        JSONObject dataPost = new JSONObject().put("strings", "data POST");
-        Response responsePost = api_.putEvent(streamPost, dataPost.toString(), authKeyPost, HttpMethod.POST);
+        HashMap<String, String> dataPost = new HashMap<String, String>();
+        dataPost.put("strings", "data POST");
+        Response responsePost = api_.putEvent(streamPost, new Gson().toJson(dataPost), authKeyPost, HttpMethod.POST);
 
         System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status +
                            "; Error: " + responsePost.error);
@@ -90,14 +95,17 @@ public class Example {
         String streamBulk = "ibtest";
         LinkedList<String> dataBulkList1 = new LinkedList<String>();
 
-        JSONObject dataBulk1 = new JSONObject().put("strings", "test BULK 1");
-        dataBulkList1.add(dataBulk1.toString());
+        HashMap<String, String> dataBulk1 = new HashMap<String, String>();
+        dataBulk1.put("strings", "data BULK 1");
+        dataBulkList1.add(new Gson().toJson(dataBulk1));
 
-        JSONObject dataBulk2 = new JSONObject().put("strings", "test BULK 2");
-        dataBulkList1.add(dataBulk2.toString());
+        HashMap<String, String> dataBulk2 = new HashMap<String, String>();
+        dataBulk2.put("strings", "data BULK 2");
+        dataBulkList1.add(new Gson().toJson(dataBulk2));
 
-        JSONObject dataBulk3 = new JSONObject().put("strings", "test BULK 3");
-        dataBulkList1.add(dataBulk3.toString());
+        HashMap<String, String> dataBulk3 = new HashMap<String, String>();
+        dataBulk3.put("strings", "data BULK 3");
+        dataBulkList1.add(new Gson().toJson(dataBulk3));
 
         api_.setAuth("");
 
@@ -108,14 +116,17 @@ public class Example {
 
         LinkedList<String> dataBulkList2 = new LinkedList<String>();
 
-        dataBulk1 = new JSONObject().put("strings", "test BULK 1 1");
-        dataBulkList2.add(dataBulk1.toString());
+        HashMap<String, String> dataBulk11 = new HashMap<String, String>();
+        dataBulk11.put("strings", "data BULK 1 1");
+        dataBulkList2.add(new Gson().toJson(dataBulk11));
 
-        dataBulk2 = new JSONObject().put("strings", "test BULK 1 2");
-        dataBulkList2.add(dataBulk2.toString());
+        HashMap<String, String> dataBulk12 = new HashMap<String, String>();
+        dataBulk12.put("strings", "data BULK 1 2");
+        dataBulkList2.add(new Gson().toJson(dataBulk12));
 
-        dataBulk3 = new JSONObject().put("strings", "test BULK 1 3");
-        dataBulkList2.add(dataBulk3.toString());
+        HashMap<String, String> dataBulk13 = new HashMap<String, String>();
+        dataBulk13.put("strings", "data BULK 1 3");
+        dataBulkList2.add(dataBulk13.toString());
 
         Response responseBulk2 = api_.putEvents(streamBulk, Utils.listToJson(dataBulkList2));
 

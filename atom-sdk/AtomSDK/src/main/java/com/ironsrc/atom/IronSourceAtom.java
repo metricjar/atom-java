@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class IronSourceAtom {
     private static String TAG_ = "IronSourceAtom";
 
-    protected static String API_VERSION_ = "V1.0.0";
+    protected static String API_VERSION_ = "V1.1.0";
 
     protected String endpoint_ = "http://track.atom-data.io/";
     protected String authKey_ = "";
@@ -40,7 +40,7 @@ public class IronSourceAtom {
      * Init header for server
      */
     protected void initHeaders() {
-        headers_.put("x-ironsource-atom-sdk-type", "dotnet");
+        headers_.put("x-ironsource-atom-sdk-type", "java");
         headers_.put("x-ironsource-atom-sdk-version", IronSourceAtom.API_VERSION_);
     }
 
