@@ -11,7 +11,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Custom utils method for converting data, encrypt and etc.
@@ -31,7 +31,7 @@ public class Utils {
      * @param listData data for convert
      * @return json string
      */
-    public static String listToJson(LinkedList<String> listData) {
+    public static String listToJson(List<String> listData) {
         String resultJson = "[";
         for (String entry: listData) {
             resultJson += entry + ",";

@@ -3,10 +3,7 @@
  */
 package com.ironsrc.atom;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -194,15 +191,25 @@ public class IronSourceAtomTracker {
         return duration;
     }
 
+    /**
+     * Flush event to stream
+     * @param stream name of stream
+     * @param authKey secret key for stream
+     * @param events list of events
+     */
     private void flushEvent(String stream, String authKey, LinkedList<String> events) {
-        LinkedList<String> buffer = new LinkedList<String>(events);
+        List<String> buffer = new LinkedList<String>(events);
         events.clear();
 
-        eventPool_.addEvent(new EventTask(stream, authKey, buffer) {
-            public void action() {
-                flushData(this.stream_, this.authKey_, this.buffer_);
-            }
-        });
+        try {
+            eventPool_.addEvent(new EventTask(stream, authKey, buffer) {
+                public void action() {
+                    flushData(this.stream_, this.authKey_, this.buffer_);
+                }
+            });
+        } catch (Exception ex) {
+            printLog(ex.getMessage());
+        }
     }
 
     /**
@@ -292,7 +299,7 @@ public class IronSourceAtomTracker {
      * @param authKey secret key for stream
      * @param data for sending to server
      */
-    private void flushData(String stream, String authKey, LinkedList<String> data) {
+    private void flushData(String stream, String authKey, List<String> data) {
         int attempt = 1;
 
         while (true) {

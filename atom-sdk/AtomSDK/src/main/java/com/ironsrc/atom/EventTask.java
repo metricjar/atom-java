@@ -1,10 +1,9 @@
 /**
- * Created by valentine.pavchuk on 7/20/16.
+ * Created by g8y3e on 7/20/16.
  */
 package com.ironsrc.atom;
 
-
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Thread pool task for sending data
@@ -12,7 +11,7 @@ import java.util.LinkedList;
 public abstract class EventTask {
     protected String stream_;
     protected String authKey_;
-    protected LinkedList<String> buffer_;
+    protected List<String> buffer_;
 
     /**
      * Constructor for thread pool task
@@ -20,7 +19,7 @@ public abstract class EventTask {
      * @param authKey
      * @param buffer
      */
-    public EventTask(String stream, String authKey, LinkedList<String> buffer) {
+    public EventTask(String stream, String authKey, List<String> buffer) {
         stream_ = stream;
         authKey_ = authKey;
         buffer_ = buffer;

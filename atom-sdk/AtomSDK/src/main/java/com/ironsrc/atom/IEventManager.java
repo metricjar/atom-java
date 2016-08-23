@@ -1,5 +1,5 @@
 /**
- * Created by valentine.pavchuk on 7/20/16.
+ * Created by g8y3e on 7/20/16.
  */
 package com.ironsrc.atom;
 

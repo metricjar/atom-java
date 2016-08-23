@@ -5,6 +5,7 @@ package com.ironsrc.atom;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * ironSource Atom low level API class, supports putEvent() and putEvents()
@@ -142,7 +143,7 @@ public class IronSourceAtom {
      * @param authKey auth key for stream
      * @return response from server
      */
-    public Response putEvents(String stream, LinkedList<String> data,
+    public Response putEvents(String stream, List<String> data,
                                 String authKey) {
         String json = Utils.listToJson(data);
         return this.putEvents(stream, json, authKey);
@@ -154,7 +155,7 @@ public class IronSourceAtom {
      * @param data for request data
      * @return response from server
      */
-    public Response putEvents(String stream, LinkedList<String> data) {
+    public Response putEvents(String stream, List<String> data) {
        return this.putEvents(stream, data, "");
     }
 

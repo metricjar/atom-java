@@ -15,6 +15,19 @@ public class EventTaskPool {
     private int maxEvents_;
 
     /**
+     * Exception for Event Task Pool
+     */
+    public class EventTaskPoolException extends Exception {
+        /**
+         * Custom exception constructor
+         * @param message error message
+         */
+        public EventTaskPoolException(String message) {
+            super(message);
+        }
+    }
+
+    /**
      * Initializes a new instance of the ironsource.EventTaskPool class.
      * @param maxThreads max thread for event pool
      * @param maxEvents max events for event pool
@@ -43,10 +56,6 @@ public class EventTaskPool {
      */
     public void stop() {
         isRunning_ = false;
-
-       /* foreach (Thread thread in workers_) {
-            thread.Join();
-        }*/
     }
 
     /**
@@ -71,9 +80,9 @@ public class EventTaskPool {
      * Add the event.
      * @param eventTask event callback action
      */
-    public void addEvent(EventTask eventTask) {
+    public void addEvent(EventTask eventTask) throws EventTaskPoolException {
         if (events_.size() > maxEvents_) {
-            //throw new EventTaskPoolException("Exceeded max event count in Event Task Pool!");
+            throw new EventTaskPoolException("Exceeded max event count in Event Task Pool!");
         }
         events_.add(eventTask);
     }
