@@ -114,21 +114,21 @@ public class Example {
         System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status +
                            "; Error: " + responseBulk.error);
 
-        LinkedList<String> dataBulkList2 = new LinkedList<String>();
+        LinkedList<HashMap<String, String>> dataBulkList2 = new LinkedList<HashMap<String, String>>();
 
         HashMap<String, String> dataBulk11 = new HashMap<String, String>();
         dataBulk11.put("strings", "data BULK 1 1");
-        dataBulkList2.add(new Gson().toJson(dataBulk11));
+        dataBulkList2.add(dataBulk11);
 
         HashMap<String, String> dataBulk12 = new HashMap<String, String>();
         dataBulk12.put("strings", "data BULK 1 2");
-        dataBulkList2.add(new Gson().toJson(dataBulk12));
+        dataBulkList2.add(dataBulk12);
 
         HashMap<String, String> dataBulk13 = new HashMap<String, String>();
         dataBulk13.put("strings", "data BULK 1 3");
-        dataBulkList2.add(dataBulk13.toString());
+        dataBulkList2.add(dataBulk13);
 
-        Response responseBulk2 = api_.putEvents(streamBulk, Utils.listToJson(dataBulkList2));
+        Response responseBulk2 = api_.putEvents(streamBulk, Utils.objectToJson(dataBulkList2));
 
         System.out.println("Data: " + responseBulk2.data + "; Status: " + responseBulk2.status +
                            "; Error: " + responseBulk2.error);

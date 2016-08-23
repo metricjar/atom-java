@@ -28,20 +28,7 @@ dependencies {
 ```
 
 ## Installation for Maven Project
-Add repository for you pom.xml
-```xml
-<repositories>
-    <repository>
-        <id>atom-java</id>
-        <url>https://raw.github.com/ironSource/atom-java/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
-</repositories>
-```
-and add dependency for Atom SDK
+Add dependency for Atom SDK
 ```xml
 <dependencies>
     <dependency>
@@ -69,9 +56,10 @@ tracker_.setBulkSize(4);
 tracker_.setFlushInterval(2000);
 tracker_.setEndpoint("http://track.atom-data.io/");
 
-String dataTrack = "{\"strings\": \"data track\"}";
+HashMap<String, String> dataTrack = new HashMap<String, String>();
+dataTrack.put("strings", "data track");
 // add data to queue
-tracker_.track("<YOUR_STREAM_NAME>", dataTrack, "<YOUR_AUTH_KEY>");
+tracker_.track("<YOUR_STREAM_NAME>", new Gson().toJson(dataTrack), "<YOUR_AUTH_KEY>");
 
 // send data with default key that was initiated with method setAuth 
 tracker_.track("<YOUR_STREAM_NAME>", dataTrack);
@@ -121,25 +109,36 @@ api_.enableDebug(true);
 
 String streamGet = "<YOUR_STREAM_NAME>";
 String authKey = "<YOUR_AUTH_KEY>";
-String dataGet = "{\"strings\": \"data GET\"}";
+HashMap<String, String> dataGet = new HashMap<String, String>();
+dataGet.put("strings", "data GET");
 
-Response responseGet = api_.putEvent(streamGet, dataGet, authKey, HttpMethod.GET);
+Response responseGet = api_.putEvent(streamGet, new Gson().toJson(dataGet), authKey, HttpMethod.GET);
 
 System.out.println("Data: " + responseGet.data);
 
 String streamPost = "<YOUR_STREAM_NAME>";
 String authKeyPost = "<YOUR_AUTH_KEY>";
-String dataPost = "{\"strings\": \"data POST\"}";
+HashMap<String, String> dataPost = new HashMap<String, String>();
+dataPost.put("strings", "data POST");
 
-Response responsePost = api_.putEvent(streamPost, dataPost, authKeyPost, HttpMethod.POST);
+Response responsePost = api_.putEvent(streamPost, new Gson().toJson(dataPost), authKeyPost, HttpMethod.POST);
 
 System.out.println("Data: " + responsePost.data);
 
 String streamBulk = "<YOUR_STREAM_NAME>";
 LinkedList<String> dataBulk = new LinkedList<String>();
-dataBulk.add("{\"strings\": \"test BULK 1\"}");
-dataBulk.add("{\"strings\": \"test BULK 2\"}");
-dataBulk.add("{\"strings\": \"test BULK 3\"}");
+
+HashMap<String, String> dataBulk1 = new HashMap<String, String>();
+dataBulk1.put("strings", "data BULK 1");
+dataBulk.add(new Gson().toJson(dataBulk1));
+
+HashMap<String, String> dataBulk2 = new HashMap<String, String>();
+dataBulk2.put("strings", "data BULK 2");
+dataBulk.add(new Gson().toJson(dataBulk2));
+
+HashMap<String, String> dataBulk3 = new HashMap<String, String>();
+dataBulk3.put("strings", "data BULK 3");
+dataBulk.add(new Gson().toJson(dataBulk3));
 
 api_.setAuth("<YOUR_AUTH_KEY>");
 Response responseBulk = api_.putEvents(streamBulk, dataBulk);
