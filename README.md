@@ -13,14 +13,7 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Sending an event](#Using-the-IronSource-API-to-send-events)
 
 ## Instalation for Gradle Project
-Add repository for you gradle config file
-```java
-repositories {
-   maven { url "https://raw.github.com/ironSource/atom-java/mvn-repo/" }
-}
-
-```
-and add dependency for Atom SDK
+Add add dependency for Atom SDK
 ```java
 dependencies {
    compile 'com.ironsrc.atom:atom-sdk:1.1.0'
@@ -157,4 +150,4 @@ MIT
 [coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
 [maven-image]: https://img.shields.io/badge/maven%20build-v1.1.0-green.svg
-[maven-url]: https://github.com/ironSource/atom-java/tree/mvn-repo
+[maven-url]: http://search.maven.org/#artifactdetails%7Ccom.ironsrc.atom%7Catom-sdk%7C1.1.0%7Cjar
