@@ -1,17 +1,14 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class EventTaskPool {
+    // List of events inside a Linked Queue for efficient growing and shrinking
     private ConcurrentLinkedQueue<EventTask> events_;
     private Boolean isRunning_;
-
+    // List of workers that send currently to Atom
     private LinkedList<Thread> workers_;
-
     private int maxEvents_;
 
     /**
@@ -20,6 +17,7 @@ public class EventTaskPool {
     public class EventTaskPoolException extends Exception {
         /**
          * Custom exception constructor
+         *
          * @param message error message
          */
         public EventTaskPoolException(String message) {
@@ -28,18 +26,20 @@ public class EventTaskPool {
     }
 
     /**
-     * Initializes a new instance of the ironsource.EventTaskPool class.
-     * @param maxThreads max thread for event pool
-     * @param maxEvents max events for event pool
+     * Initializes a new instance of the EventTaskPool class.
+     *
+     * @param maxWorkers max threads for event pool
+     * @param maxEvents  max events for event pool
      */
-    public EventTaskPool(int maxThreads, int maxEvents) {
+    public EventTaskPool(int maxWorkers, int maxEvents) {
         maxEvents_ = maxEvents;
         events_ = new ConcurrentLinkedQueue<EventTask>();
         isRunning_ = true;
 
         workers_ = new LinkedList<Thread>();
 
-        for (int index = 0; index < maxThreads; ++index) {
+        // Initialize {maxWorkers} amount of threads that will handle sending all events for each stream
+        for (int index = 0; index < maxWorkers; ++index) {
             Thread workerThread = new Thread(new Runnable() {
                 public void run() {
                     taskWorker();
@@ -59,7 +59,7 @@ public class EventTaskPool {
     }
 
     /**
-     * Tasks the worker.
+     * Worker task function - handles the event sending for each worker
      */
     private void taskWorker() {
         while (isRunning_) {
@@ -71,13 +71,13 @@ public class EventTaskPool {
                 }
                 continue;
             }
-
             eventTask.action();
         }
     }
 
     /**
-     * Add the event.
+     * Add worker to task pool
+     *
      * @param eventTask event callback action
      */
     public void addEvent(EventTask eventTask) throws EventTaskPoolException {

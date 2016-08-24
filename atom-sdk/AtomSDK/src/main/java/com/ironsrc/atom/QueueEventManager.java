@@ -1,13 +1,10 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Queue event manager.
+ * Queue event manager (in memory Q that implements Interface EventManager).
  */
 public class QueueEventManager implements IEventManager {
     private ConcurrentHashMap<String, ConcurrentLinkedQueue<Event>> events_;
@@ -20,8 +17,9 @@ public class QueueEventManager implements IEventManager {
     }
 
     /**
-     * Add event to storage
-     * @param eventObject event for adding to storage
+     * Add event to Queue
+     *
+     * @param eventObject event that will be added to queue
      */
     public void addEvent(Event eventObject) {
         if (!events_.containsKey(eventObject.stream_)) {
@@ -32,9 +30,10 @@ public class QueueEventManager implements IEventManager {
     }
 
     /**
-     * Get Event from storage
-     * @param stream name of the stream
-     * @return
+     * Get events for a given stream
+     *
+     * @param stream stream to get the events for
+     * @return eventObject first event from the event queue
      */
     public Event getEvent(String stream) {
         Event eventObject = null;

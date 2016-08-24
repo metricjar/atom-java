@@ -1,11 +1,10 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 /**
  * Holds event data (stream name, data itself and auth key for stream)
+ * Used inside the Tracker
  */
+
 public class Event {
     public String data_;
     public String stream_;
@@ -13,8 +12,9 @@ public class Event {
 
     /**
      * Batch constructor
-     * @param stream name of stream.
-     * @param data data for server.
+     *
+     * @param stream  name of stream.
+     * @param data    data for server.
      * @param authKey secret key for stream
      */
     public Event(String stream, String data, String authKey) {

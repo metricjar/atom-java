@@ -1,6 +1,3 @@
-/**
- * Created by g8y3e on 7/18/16.
- */
 package com.ironsrc.atom;
 
 /**

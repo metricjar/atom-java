@@ -1,6 +1,3 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 import java.util.*;
@@ -47,16 +44,17 @@ public class IronSourceAtomTracker {
     private Random random_;
 
     /**
-     * API Tracker constructor
+     * Atom Tracker constructor
      */
     public IronSourceAtomTracker() {
         this(TASK_WORKER_COUNT_, TASK_POOL_SIZE_);
     }
 
     /**
-     * API Tracker constructor
-     * @param taskWorkersCount worker count
-     * @param taskPoolSize set pool size
+     * Atom Tracker constructor
+     *
+     * @param taskWorkersCount amount of workers (threads) for concurrent sending
+     * @param taskPoolSize     amount of bulk events ({stream,auth,buffer}) to store in task pool
      */
     public IronSourceAtomTracker(int taskWorkersCount, int taskPoolSize) {
         api_ = new IronSourceAtom();
@@ -85,6 +83,7 @@ public class IronSourceAtomTracker {
 
     /**
      * Sets the event manager.
+     *
      * @param eventManager custom event manager
      */
     public void setEventManager(IEventManager eventManager) {
@@ -93,6 +92,7 @@ public class IronSourceAtomTracker {
 
     /**
      * Enabling print debug information
+     *
      * @param isDebug If set to true is debug.
      */
     public void enableDebug(Boolean isDebug) {
@@ -103,14 +103,16 @@ public class IronSourceAtomTracker {
 
     /**
      * Set Auth Key for stream
-     * @param authKey for secret key of stream.
+     *
+     * @param authKey HMAC auth key for stream
      */
     public void setAuth(String authKey) {
         api_.setAuth(authKey);
     }
 
     /**
-     * Set endpoint for send data
+     * Set Atom Endpoint for sending data
+     *
      * @param endpoint for address of server
      */
     public void setEndpoint(String endpoint) {
@@ -118,34 +120,38 @@ public class IronSourceAtomTracker {
     }
 
     /**
-     * Set Bulk data count
-     * @param bulkSize count of event for flush
+     * Set bulk size (amount of events) for flush
+     *
+     * @param bulkSize upon reaching this amount, flush the buffer
      */
     public void setBulkSize(int bulkSize) {
         bulkSize_ = bulkSize;
     }
 
     /**
-     * Set Bult data bytes size
-     * @param bulkBytesSize size in bytes
+     * Set bulk size in bytes
+     *
+     * @param bulkBytesSize upon reaching this size, flush the buffer
      */
     public void setBulkBytesSize(int bulkBytesSize) {
         bulkBytesSize_ = bulkBytesSize;
     }
 
     /**
-     * Set intervals for flushing data
-     * @param flushInterval intervals in seconds
+     * Set data flushing interval
+     *
+     * @param flushInterval flush the events every {flush interval} ms
      */
     public void setFlushInterval(long flushInterval) {
         flushInterval_ = flushInterval;
     }
 
     /**
-     * Track data to server
-     * @param stream name of the stream
-     * @param data info for sending
-     * @param authKey secret token for stream
+     * Track data (store it before sending)
+     *
+     * @param stream  stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
      */
     public void track(String stream, String data, String authKey) {
         if (authKey.length() == 0) {
@@ -155,32 +161,33 @@ public class IronSourceAtomTracker {
         if (!streamData_.containsKey(stream)) {
             streamData_.putIfAbsent(stream, authKey);
         }
-
         eventManager_.addEvent(new Event(stream, data, authKey));
     }
 
     /**
-     * Track data to server
-     * @param stream name of the stream
-     * @param data info for sending
+     * Track data (store it before sending)
+     *
+     * @param stream stream name for saving data in db table
+     * @param data   user data to send
      */
     public void track(String stream, String data) {
         this.track(stream, data, api_.getAuth());
     }
 
     /**
-     * Flush all data to server
+     * Flush all data to Atom API
      */
     public void flush() {
         isFlushData_ = true;
     }
 
     /**
-     * Gets the duration.
+     * Gets the duration for calculating retry time on failure
+     *
      * @param attempt attempt count
      * @return duration
      */
-    private double getDuration(int attempt) {
+    private double getRetryTime(int attempt) {
         double duration = minTime_ * Math.pow(2, attempt);
         duration = (random_.nextDouble() * (duration - minTime_)) + minTime_;
 
@@ -193,9 +200,10 @@ public class IronSourceAtomTracker {
 
     /**
      * Flush event to stream
-     * @param stream name of stream
-     * @param authKey secret key for stream
-     * @param events list of events
+     *
+     * @param stream  stream name for saving data in db table
+     * @param authKey HMAC auth key for stream
+     * @param events  list of events
      */
     private void flushEvent(String stream, String authKey, LinkedList<String> events) {
         List<String> buffer = new LinkedList<String>(events);
@@ -213,7 +221,7 @@ public class IronSourceAtomTracker {
     }
 
     /**
-     * Events the worker.
+     * Main tracker handler function, handles the flushing conditions
      */
     private void eventWorker() {
         HashMap<String, Long> timerStartTime = new HashMap<String, Long>();
@@ -294,10 +302,11 @@ public class IronSourceAtomTracker {
     }
 
     /**
-     * Flush the data.
-     * @param stream name of the stream
-     * @param authKey secret key for stream
-     * @param data for sending to server
+     * Flushes the data to atom API
+     *
+     * @param stream  stream name for saving data in db table
+     * @param authKey HMAC auth key for stream
+     * @param data    bulk of events to send
      */
     private void flushData(String stream, String authKey, List<String> data) {
         int attempt = 1;
@@ -309,7 +318,7 @@ public class IronSourceAtomTracker {
                 break;
             }
 
-            int duration = (int)(getDuration(attempt++) * 1000);
+            int duration = (int) (getRetryTime(attempt++) * 1000);
             try {
                 Thread.sleep(duration);
             } catch (InterruptedException ex) {
@@ -321,6 +330,7 @@ public class IronSourceAtomTracker {
 
     /**
      * Print the log.
+     *
      * @param logData data to print
      */
     protected void printLog(String logData) {

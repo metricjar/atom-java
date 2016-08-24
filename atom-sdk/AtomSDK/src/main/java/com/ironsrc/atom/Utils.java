@@ -1,6 +1,3 @@
-/**
- * Created by g8y3e on 7/18/16.
- */
 package com.ironsrc.atom;
 
 import com.google.gson.Gson;
@@ -14,11 +11,12 @@ import java.net.URLEncoder;
 import java.util.List;
 
 /**
- * Custom utils method for converting data, encrypt and etc.
+ * Custom utils method for converting data, encryption, etc...
  */
 public class Utils {
     /**
      * Convert Object to json string
+     *
      * @param object data for convert
      * @return json string
      */
@@ -28,16 +26,17 @@ public class Utils {
 
     /**
      * Convert List to json string
+     *
      * @param listData data for convert
      * @return json string
      */
     public static String listToJson(List<String> listData) {
         String resultJson = "[";
-        for (String entry: listData) {
+        for (String entry : listData) {
             resultJson += entry + ",";
         }
 
-        resultJson = resultJson.substring(0, resultJson.length()-1);
+        resultJson = resultJson.substring(0, resultJson.length() - 1);
         resultJson += "]";
 
         return resultJson;
@@ -45,8 +44,9 @@ public class Utils {
 
     /**
      * Encode data to HMAC SHA-256
-     * @param data data for encode
-     * @param key key for encode
+     *
+     * @param data data for encoding
+     * @param key  key for encryption
      * @return encoded data
      */
     public static String encodeHmac(String data, String key) {
@@ -65,8 +65,9 @@ public class Utils {
 
     /**
      * Encode data to base64
-     * @param data data to encode
-     * @param encoding for example "UTF-8"
+     *
+     * @param data     data to encode
+     * @param encoding type of encoding, for example "UTF-8"
      * @return encoded data
      */
     public static String base64Encode(String data, String encoding) {
@@ -81,9 +82,10 @@ public class Utils {
     }
 
     /**
-     * Url encode data for url
-     * @param data data to escape
-     * @param encoding for example "UTF-8"
+     * encode a given url
+     *
+     * @param data     data to encode
+     * @param encoding type of encoding, for example "UTF-8"
      * @return escaped data
      */
     public static String urlEncode(String data, String encoding) {
@@ -97,6 +99,7 @@ public class Utils {
 
     /**
      * Get the current milliseconds.
+     *
      * @return current milliseconds
      */
     public static long getCurrentMilliseconds() {

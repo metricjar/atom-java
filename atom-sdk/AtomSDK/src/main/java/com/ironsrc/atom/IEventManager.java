@@ -1,23 +1,22 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 /**
- * Interface for store data
+ * Interface for storing data in a backlog
  */
 public interface IEventManager {
 
     /**
-     * Add the event.
+     * Add an event.
+     *
      * @param eventObject event data object
      */
-    public void addEvent(Event eventObject);
+    void addEvent(Event eventObject);
 
     /**
-     * Get one the event from store.
-     * @param stream name of the stream
+     * Get one event from data store
+     *
+     * @param stream name of the atom stream
      * @return event object
      */
-    public Event getEvent(String stream);
+    Event getEvent(String stream);
 }

@@ -1,12 +1,9 @@
-/**
- * Created by g8y3e on 7/20/16.
- */
 package com.ironsrc.atom;
 
 import java.util.List;
 
 /**
- * Thread pool task for sending data
+ * This class holds the streams and related data inside the EventTaskPool
  */
 public abstract class EventTask {
     protected String stream_;
@@ -14,10 +11,11 @@ public abstract class EventTask {
     protected List<String> buffer_;
 
     /**
-     * Constructor for thread pool task
-     * @param stream
-     * @param authKey
-     * @param buffer
+     * Constructor for EventTask
+     *
+     * @param stream  Atom Stream name
+     * @param authKey Stream HMAC auth key
+     * @param buffer  Buffer with all events for current stream
      */
     public EventTask(String stream, String authKey, List<String> buffer) {
         stream_ = stream;
@@ -26,7 +24,7 @@ public abstract class EventTask {
     }
 
     /**
-     * Action for run async
+     * Action for running async
      */
     public abstract void action();
 }
