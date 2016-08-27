@@ -1,8 +1,7 @@
 package com.ironsrc.atom;
 
 /**
- * Holds event data (stream name, data itself and auth key for stream)
- * Used inside the Tracker
+ * Holds a single atom event data (stream name, data itself and auth key for stream)
  */
 
 public class Event {
@@ -11,11 +10,11 @@ public class Event {
     public String authKey_;
 
     /**
-     * Batch constructor
+     * Event class constructor
      *
-     * @param stream  name of stream.
-     * @param data    data for server.
-     * @param authKey secret key for stream
+     * @param stream  Atom Stream name
+     * @param authKey Stream HMAC auth key
+     * @param data    Stringified event data
      */
     public Event(String stream, String data, String authKey) {
         stream_ = stream;

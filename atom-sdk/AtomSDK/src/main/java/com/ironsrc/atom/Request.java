@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Wrapper for HTTP request to Atom API
+ * Wrapper for HTTP requests to Atom API
  */
 public class Request {
     private static String TAG_ = "Request";

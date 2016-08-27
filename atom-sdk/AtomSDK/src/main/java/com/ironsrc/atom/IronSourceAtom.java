@@ -209,7 +209,7 @@ public class IronSourceAtom {
     }
 
     /**
-     * Send data to server
+     * Send data to Atom API
      *
      * @param url     atom API url
      * @param method  HTTP METHOD (POST or GET)

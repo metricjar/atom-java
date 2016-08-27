@@ -3,21 +3,21 @@ package com.ironsrc.atom;
 import java.util.List;
 
 /**
- * This class holds the streams and related data inside the EventTaskPool
+ * Holds a batch(bulk) of events and related data for a given stream
  */
-public abstract class EventTask {
+public abstract class BatchEvent {
     protected String stream_;
     protected String authKey_;
     protected List<String> buffer_;
 
     /**
-     * Constructor for EventTask
+     * Constructor for BatchEvent
      *
      * @param stream  Atom Stream name
      * @param authKey Stream HMAC auth key
      * @param buffer  Buffer with all events for current stream
      */
-    public EventTask(String stream, String authKey, List<String> buffer) {
+    public BatchEvent(String stream, String authKey, List<String> buffer) {
         stream_ = stream;
         authKey_ = authKey;
         buffer_ = buffer;

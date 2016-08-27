@@ -1,23 +1,20 @@
-/**
- * Created by g8y3e on 7/22/16.
- */
 import com.ironsrc.atom.Event;
-import com.ironsrc.atom.IEventManager;
-import com.ironsrc.atom.QueueEventManager;
+import com.ironsrc.atom.IEventStorage;
+import com.ironsrc.atom.QueueEventStorage;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class QueueEventManagerTest {
+public class QueueEventStorageTest {
     @Test
     public void testCreateObject() {
-        IEventManager eventManager = new QueueEventManager();
+        IEventStorage eventManager = new QueueEventStorage();
 
         Assert.assertEquals(eventManager.getEvent(""), null);
     }
 
     @Test
     public void testEventGetAdd() {
-        IEventManager eventManager = new QueueEventManager();
+        IEventStorage eventManager = new QueueEventStorage();
         String streamName = "test stream";
 
         Event expectedEvent = new Event(streamName, "test data", "test auth");

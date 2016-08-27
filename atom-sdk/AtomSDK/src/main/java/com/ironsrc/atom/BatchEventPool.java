@@ -3,46 +3,50 @@ package com.ironsrc.atom;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class EventTaskPool {
+/**
+ * Handles concurrent event sending
+ * Handles the backlog of BatchEvents
+ */
+public class BatchEventPool {
     // List of events inside a Linked Queue for efficient growing and shrinking
-    private ConcurrentLinkedQueue<EventTask> events_;
+    private ConcurrentLinkedQueue<BatchEvent> batchEventsQueue_;
     private Boolean isRunning_;
     // List of workers that send currently to Atom
     private LinkedList<Thread> workers_;
     private int maxEvents_;
 
     /**
-     * Exception for Event Task Pool
+     * Exception for Batch Event Pool
      */
-    public class EventTaskPoolException extends Exception {
+    public class BatchEventPoolException extends Exception {
         /**
          * Custom exception constructor
          *
          * @param message error message
          */
-        public EventTaskPoolException(String message) {
+        public BatchEventPoolException(String message) {
             super(message);
         }
     }
 
     /**
-     * Initializes a new instance of the EventTaskPool class.
+     * Initializes a new instance of the BatchEventPool class.
      *
      * @param maxWorkers max threads for event pool
      * @param maxEvents  max events for event pool
      */
-    public EventTaskPool(int maxWorkers, int maxEvents) {
+    public BatchEventPool(int maxWorkers, int maxEvents) {
         maxEvents_ = maxEvents;
-        events_ = new ConcurrentLinkedQueue<EventTask>();
+        batchEventsQueue_ = new ConcurrentLinkedQueue<BatchEvent>();
         isRunning_ = true;
 
         workers_ = new LinkedList<Thread>();
 
-        // Initialize {maxWorkers} amount of threads that will handle sending all events for each stream
+        // Initialize {maxWorkers} amount of threads that handle sending batch events
         for (int index = 0; index < maxWorkers; ++index) {
             Thread workerThread = new Thread(new Runnable() {
                 public void run() {
-                    taskWorker();
+                    batchWorkerTask();
                 }
             });
             workers_.add(workerThread);
@@ -59,31 +63,32 @@ public class EventTaskPool {
     }
 
     /**
-     * Worker task function - handles the event sending for each worker
+     * Batch worker task function - each worker (thread) is polling the Queue for a batch event
+     * and handles the sending of the data
      */
-    private void taskWorker() {
+    private void batchWorkerTask() {
         while (isRunning_) {
-            EventTask eventTask = events_.poll();
-            if (eventTask == null) {
+            BatchEvent batchEvent = batchEventsQueue_.poll();
+            if (batchEvent == null) {
                 try {
                     Thread.sleep(25);
                 } catch (InterruptedException ex) {
                 }
                 continue;
             }
-            eventTask.action();
+            batchEvent.action();
         }
     }
 
     /**
      * Add worker to task pool
      *
-     * @param eventTask event callback action
+     * @param batchEvent event callback action
      */
-    public void addEvent(EventTask eventTask) throws EventTaskPoolException {
-        if (events_.size() > maxEvents_) {
-            throw new EventTaskPoolException("Exceeded max event count in Event Task Pool!");
+    public void addEvent(BatchEvent batchEvent) throws BatchEventPoolException {
+        if (batchEventsQueue_.size() > maxEvents_) {
+            throw new BatchEventPoolException("Exceeded max event count in BatchEventPool!");
         }
-        events_.add(eventTask);
+        batchEventsQueue_.add(batchEvent);
     }
 }

@@ -1,9 +1,9 @@
 package com.ironsrc.atom;
 
 /**
- * Interface for storing data in a backlog
+ * Interface for providing a generic way of storing events in a backlog before they are sent to Atom.
  */
-public interface IEventManager {
+public interface IEventStorage {
 
     /**
      * Add an event.
