@@ -110,8 +110,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
-                            <exclude>**/EventTask*</exclude>
-                            <exclude>**/*Atom*</exclude>
+                            <exclude>**/BatchEvent*</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
                     </instrumentation>
