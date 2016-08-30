@@ -84,6 +84,7 @@ public class BatchEventPool {
      * Add worker to task pool
      *
      * @param batchEvent event callback action
+     * @throws BatchEventPoolException thrown if batchEventQueue is bigger than maxEvents
      */
     public void addEvent(BatchEvent batchEvent) throws BatchEventPoolException {
         if (batchEventsQueue_.size() > maxEvents_) {

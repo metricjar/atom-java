@@ -10,7 +10,7 @@ public class IronSourceAtomTracker {
     private static String TAG_ = "IronSourceAtomTracker";
 
     // Number of concurrent worker threads for BatchEventPool workers
-    private static int BATCH_WORKERS_COUNT_ = 24;
+    private static int BATCH_WORKERS_COUNT_ = 5;
 
     // Number of batch events inside BatchEventPool
     private static int BATCH_POOL_SIZE_ = 5000;
@@ -31,7 +31,7 @@ public class IronSourceAtomTracker {
     private IronSourceAtom api_;
 
     private Boolean isDebug_ = false;
-    private Boolean isFlushData_ = false;
+    public volatile Boolean isFlushData_ = false;
 
     private Boolean isRunWorker_ = true;
     private Thread eventWorkerThread_;
@@ -44,6 +44,7 @@ public class IronSourceAtomTracker {
     // Backlog of batch events that are ready to be handled (sent to Atom) by workers (threads)
     private BatchEventPool batchEventPool_;
     private Random random_;
+    private Timer flushTimer;
 
     /**
      * Atom Tracker constructor
@@ -65,21 +66,40 @@ public class IronSourceAtomTracker {
         streamToAuthMap_ = new ConcurrentHashMap<String, String>();
 
         random_ = new Random();
+        flushTimer = new Timer();
 
         eventWorkerThread_ = new Thread(new Runnable() {
             public void run() {
                 trackerHandler();
             }
         });
+
+        // Flush records every {flushInterval} seconds
+        setTimer();
         eventWorkerThread_.start();
+    }
+
+    private void setTimer() {
+        flushTimer.cancel();
+        // Set Flush Interval
+        flushTimer = new Timer();
+        flushTimer.scheduleAtFixedRate(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                isFlushData_ = true;
+            }
+        }, 0, flushInterval_);
     }
 
     /**
      * Stop all event pool threads
      */
     public void stop() {
+        printLog("Tracker stop method");
         isRunWorker_ = false;
         batchEventPool_.stop();
+        flushTimer.cancel();
+        flushTimer.purge();
     }
 
     /**
@@ -138,12 +158,22 @@ public class IronSourceAtomTracker {
     }
 
     /**
+     * Set bulk size in KiloBytes
+     *
+     * @param bulkKiloBytesSize upon reaching this size, flush the buffer
+     */
+    public void setBulkKiloBytesSize(int bulkKiloBytesSize) {
+        bulkBytesSize_ = bulkKiloBytesSize * 1024;
+    }
+
+    /**
      * Set data flushing interval
      *
      * @param flushInterval flush the events every {flush interval} ms
      */
     public void setFlushInterval(long flushInterval) {
         flushInterval_ = flushInterval;
+        setTimer();
     }
 
     /**
@@ -209,7 +239,6 @@ public class IronSourceAtomTracker {
         // Clone the events list in order to clear the trackerHandler buffer
         List<String> buffer = new LinkedList<String>(events);
         events.clear();
-        // todo: check if the hashmap gets cleared
 
         try {
             batchEventPool_.addEvent(new BatchEvent(stream, authKey, buffer) {
@@ -231,40 +260,16 @@ public class IronSourceAtomTracker {
      */
     private void trackerHandler() {
 
-        // Timers for Start and Delta time per stream (used for calculating flushing interval)
-        HashMap<String, Long> timerStartTime = new HashMap<String, Long>();
-        HashMap<String, Long> timerDeltaTime = new HashMap<String, Long>();
-
-        // temporary buffers for holding event data (payload) per stream
+        // Temporary buffers for holding event data (payload) per stream
         HashMap<String, LinkedList<String>> eventsBuffer = new HashMap<String, LinkedList<String>>();
-        // buffers size storage
+        // Buffers size storage
         HashMap<String, Integer> eventsSize = new HashMap<String, Integer>();
-
+        // Clear size buffer
         Boolean isClearSize = false;
 
         while (isRunWorker_) {
             for (Map.Entry<String, String> entry : streamToAuthMap_.entrySet()) {
                 String streamName = entry.getKey();
-
-                if (!timerStartTime.containsKey(streamName)) {
-                    timerStartTime.put(streamName, Utils.getCurrentMilliseconds());
-                    timerDeltaTime.put(streamName, 0L);
-                }
-
-                timerDeltaTime.put(streamName, timerDeltaTime.get(streamName) +
-                        (Utils.getCurrentMilliseconds() - timerStartTime.get(streamName)));
-                timerStartTime.put(streamName, Utils.getCurrentMilliseconds());
-
-                // Flush when {flushinterval} has been reached
-                if (timerDeltaTime.get(streamName) >= flushInterval_) {
-                    if (eventsBuffer.get(streamName).size() > 0) {
-                        flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
-                        eventsSize.put(streamName, 0);
-                    }
-                    timerDeltaTime.put(streamName, 0L);
-                }
-
-                // Todo: Change to get all events instead of one?
                 Event eventObject = eventsBacklog_.getEvent(streamName);
                 if (eventObject == null) {
                     continue;
@@ -287,31 +292,30 @@ public class IronSourceAtomTracker {
 
                 // Flush when reaching {bulkByteSize} KB of events
                 if (eventsSize.get(streamName) >= bulkBytesSize_) {
+                    printLog("Flushing, bulk size reached: " + eventsSize.get(streamName));
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
                 }
 
                 // Flush when {bulkLength} (amount of events) has been reached
                 if (eventsBuffer.get(streamName).size() >= bulkLength_) {
+                    printLog("Flushing, bulk length reached: " + eventsBuffer.get(streamName).size());
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
                 }
 
                 // Force flush
                 if (isFlushData_) {
+                    printLog("Flushing, Force flush called");
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
+                    isFlushData_ = false;
                 }
 
                 if (isClearSize) {
                     eventsSize.put(streamName, 0);
-                    timerDeltaTime.put(streamName, 0L);
-                    isClearSize = false; //todo: bugfix
+                    isClearSize = false;
                 }
-            }
-
-            if (isFlushData_) {
-                isFlushData_ = false;
             }
         }
     }
