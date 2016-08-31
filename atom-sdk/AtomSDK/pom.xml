@@ -14,7 +14,7 @@
 
     <groupId>com.ironsrc.atom</groupId>
     <artifactId>atom-sdk</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <name>Atom SDK</name>
     <description>ironSource Atom SDK</description>
@@ -59,6 +59,11 @@
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20080701</version>
+        </dependency>
     </dependencies>
 
 
@@ -82,8 +87,8 @@
             <properties>
                 <gpg.keyname>8205766E</gpg.keyname>
                 <gpg.executable>gpg</gpg.executable>
-                <gpg.publicKeyring>pubring.gpg</gpg.publicKeyring>
-                <gpg.secretKeyring>secring.gpg</gpg.secretKeyring>
+                <gpg.publicKeyring>./gpg/pubring.gpg</gpg.publicKeyring>
+                <gpg.secretKeyring>./gpg/secring.gpg</gpg.secretKeyring>
             </properties>
         </profile>
     </profiles>
@@ -110,6 +115,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>**/Request.class</exclude>
+                            <exclude>**/Atom*</exclude>
                             <exclude>**/BatchEvent*</exclude>
                             <exclude>**/HttpMethod.class</exclude>
                         </excludes>
