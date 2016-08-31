@@ -1,54 +1,46 @@
 import com.google.gson.Gson;
 import com.ironsrc.atom.*;
+import org.json.JSONObject;
+import org.json.JSONException;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Example {
-    static Boolean isRunThreads = true;
-    static AtomicInteger requestIndex = new AtomicInteger(0);
-    static int threadIndex;
+    private static Boolean isRunThreads = true;
+    private static int threadIndex;
 
-    static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+    private static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+    private static String stream = "sdkdev_sdkdev.public.zeev";
+    private static String authKey = "I40iwPPOsG3dfWX30labriCg9HqMfL";
 
-    public static void main(String [] args) {
-        /**
-         * Example of using high level API
-         */
+    public static void main(String[] args) throws JSONException {
+        // Example of using high level API (Tracker)
         tracker_.enableDebug(true);
-        tracker_.setAuth("");
+        tracker_.setAuth(authKey);
+        System.out.println("Starting ironSource Atom example");
+        System.out.println("=== Tracker Example ===");
 
-        // test for bulk size
-        tracker_.setBulkBytesSize(2);
-        tracker_.setBulkSize(4);
-        tracker_.setFlushInterval(2000);
+        // Test for bulk size
+        tracker_.setBulkBytesSize(2048);
+        tracker_.setBulkSize(50);
+        tracker_.setFlushInterval(5000);
         tracker_.setEndpoint("http://track.atom-data.io/");
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1; ++i) {
             threadIndex = i;
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     int index = threadIndex;
                     while (isRunThreads) {
-                        String eventData = "d: " + requestIndex.incrementAndGet() +
-                                " t: " + Thread.currentThread().getId();
-
-                        HashMap<String, String> eventJson = new HashMap<String, String>();
-                        eventJson.put("strings",eventData);
+                        JSONObject jsonObject = generateRandomData("TRACKER TEST");
                         if (index < 5) {
-                            tracker_.track("ibtest", new Gson().toJson(eventJson), "");
+                            tracker_.track(stream, jsonObject.toString(), "");
                         } else {
-                            tracker_.track("ibtest2", new Gson().toJson(eventJson), "");
+                            tracker_.track("ibtest2", new Gson().toJson(jsonObject), "");
                         }
-
                         try {
-                            Thread.sleep(2000);
+                            Thread.sleep(100);
                         } catch (InterruptedException ex) {
-                        }
-
-                        if (requestIndex.get() >= 34) {
-                            isRunThreads = false;
                         }
                     }
                 }
@@ -60,77 +52,60 @@ public class Example {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            System.exit(2);
         }
-
+        System.out.println("Example: Killing Threads");
         tracker_.stop();
+        isRunThreads = false;
 
-        /**
-         * Example of using low level API
-         */
+        // Example of using low level API
+        System.out.println("\n\n=== Low level API example ===");
+
         IronSourceAtom api_ = new IronSourceAtom();
 
         api_.enableDebug(true);
         api_.setEndpoint("http://track.atom-data.io/");
+        api_.setAuth(authKey);
 
-        String streamGet = "ibtest";
-        String authKey = "";
+        JSONObject dataLowLevelApi = generateRandomData("GET METHOD TEST");
 
-        HashMap<String, String> dataGet = new HashMap<String, String>();
-        dataGet.put("strings", "data GET");
-        Response responseGet = api_.putEvent(streamGet, new Gson().toJson(dataGet), authKey, HttpMethod.GET);
+        // putEvent Get method test;
 
+        Response responseGet = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.GET);
+        dataLowLevelApi.put("strings", "POST METHOD TEST");
+
+        // putEvent Post method test
         System.out.println("Data: " + responseGet.data + "; Status: " + responseGet.status +
-                           "; Error: " + responseGet.error);
+                "; Error: " + responseGet.error);
+        Response responsePost = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.POST);
 
-        String streamPost = "ibtest";
-        String authKeyPost = "";
+        System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status + "; Error: " +
+                responsePost.error);
 
-        HashMap<String, String> dataPost = new HashMap<String, String>();
-        dataPost.put("strings", "data POST");
-        Response responsePost = api_.putEvent(streamPost, new Gson().toJson(dataPost), authKeyPost, HttpMethod.POST);
-
-        System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status +
-                           "; Error: " + responsePost.error);
-
-        String streamBulk = "ibtest";
-        LinkedList<String> dataBulkList1 = new LinkedList<String>();
-
-        HashMap<String, String> dataBulk1 = new HashMap<String, String>();
-        dataBulk1.put("strings", "data BULK 1");
-        dataBulkList1.add(new Gson().toJson(dataBulk1));
-
-        HashMap<String, String> dataBulk2 = new HashMap<String, String>();
-        dataBulk2.put("strings", "data BULK 2");
-        dataBulkList1.add(new Gson().toJson(dataBulk2));
-
-        HashMap<String, String> dataBulk3 = new HashMap<String, String>();
-        dataBulk3.put("strings", "data BULK 3");
-        dataBulkList1.add(new Gson().toJson(dataBulk3));
-
-        api_.setAuth("");
-
-        Response responseBulk = api_.putEvents(streamBulk, dataBulkList1);
-
-        System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status +
-                           "; Error: " + responseBulk.error);
-
-        LinkedList<HashMap<String, String>> dataBulkList2 = new LinkedList<HashMap<String, String>>();
-
-        HashMap<String, String> dataBulk11 = new HashMap<String, String>();
-        dataBulk11.put("strings", "data BULK 1 1");
-        dataBulkList2.add(dataBulk11);
-
-        HashMap<String, String> dataBulk12 = new HashMap<String, String>();
-        dataBulk12.put("strings", "data BULK 1 2");
-        dataBulkList2.add(dataBulk12);
-
-        HashMap<String, String> dataBulk13 = new HashMap<String, String>();
-        dataBulk13.put("strings", "data BULK 1 3");
-        dataBulkList2.add(dataBulk13);
-
-        Response responseBulk2 = api_.putEvents(streamBulk, Utils.objectToJson(dataBulkList2));
-
-        System.out.println("Data: " + responseBulk2.data + "; Status: " + responseBulk2.status +
-                           "; Error: " + responseBulk2.error);
+        // putEvents method test:
+        LinkedList<String> batchData = new LinkedList<String>();
+        for (int i = 0; i < 10; i++) {
+            batchData.add(new Gson().toJson(generateRandomData("BULK TEST")));
+        }
+        Response responseBulk = api_.putEvents(stream, batchData);
+        System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status + "; Error: " + responseBulk.error);
+        System.exit(0);
     }
+
+    // Generate JSON with random data
+    private static JSONObject generateRandomData(String methodType) {
+        double randNum = 1000 * Math.random();
+        JSONObject dataLowLevelApi = new JSONObject();
+        try {
+            dataLowLevelApi.put("event_name", "JAVA_TRACKER");
+            dataLowLevelApi.put("id", (int) randNum);
+            dataLowLevelApi.put("float_value", randNum);
+            dataLowLevelApi.put("strings", methodType);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return dataLowLevelApi;
+    }
+
 }
