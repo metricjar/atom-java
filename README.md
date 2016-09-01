@@ -10,136 +10,176 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 
 - [Signup](https://atom.ironsrc.com/#/signup)
 - [Documentation](https://ironsource.github.io/atom-java/)
-- [Sending an event](#Using-the-IronSource-API-to-send-events)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Changelog](#changelog)
+- [Example](#example)
 
-## Instalation for Gradle Project
+## Installation
+
+### Installation for Gradle Project
 Add add dependency for Atom SDK
-```java
+```ruby
 dependencies {
-   compile 'com.ironsrc.atom:atom-sdk:1.1.0'
+   compile 'com.ironsrc.atom:atom-sdk:1.5.0'
 }
 ```
 
-## Installation for Maven Project
+### Installation for Maven Project
 Add dependency for Atom SDK
 ```xml
 <dependencies>
     <dependency>
         <groupId>com.ironsrc.atom</groupId>
         <artifactId>atom-sdk</artifactId>
-        <version>1.1.0</version>
+        <version>1.5.0</version>
     </dependency>
 </dependencies>
 ```
 
-## Using the IronSource API to send events 
-### Tracker usage
-Example of track an event in Java:
+## Usage
+
+### High Level API - "Tracker"
+
+Using the Tracker. To see the full code check the [example section](#example)
 ```java
-IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
-tracker_.enableDebug(true);
-tracker_.setAuth("<YOUR_AUTH_KEY>");
+public class Example {
+    private static Boolean isRunThreads = true;
+    private static int threadIndex;
 
-// set event pool size and worker threads count
-tracker_.setTaskPoolSize(1000);
-tracker_.setTaskWorkersCount(24);
+    private static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+    private static String stream = "YOUR.STREAM.NAME";
+    private static String authKey = "HMAC_AUTH_KEY";
 
-// set bulk size and flush intervall
-tracker_.setBulkSize(4);
-tracker_.setFlushInterval(2000);
-tracker_.setEndpoint("http://track.atom-data.io/");
+    public static void main(String[] args) throws JSONException {
+        // Tracker conf
+        tracker_.enableDebug(true); // Enable of debug msg printing
+        tracker_.setAuth(authKey); // Set default auth key
+        tracker_.setBulkBytesSize(2048); // Set bulk size in bytes (default 512KB)
+        tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 20)
+        tracker_.setFlushInterval(5000); // Set flush interval in ms (default: 30 seconds)
+        tracker_.setEndpoint("http://track.atom-data.io/");
 
-HashMap<String, String> dataTrack = new HashMap<String, String>();
-dataTrack.put("strings", "data track");
-// add data to queue
-tracker_.track("<YOUR_STREAM_NAME>", new Gson().toJson(dataTrack), "<YOUR_AUTH_KEY>");
-
-// send data with default key that was initiated with method setAuth 
-tracker_.track("<YOUR_STREAM_NAME>", dataTrack);
-
-// hard flush all data in queue
-tracker_.flush();
-
-// stops all workers in task pool
-tracker_.stop();
-```
-
-### Interface for store data `IEventManager`.
-Implementation must to be synchronized for multithreading use.
-```java
-/**
- * Interface for store data
- */
-public interface IEventManager {
-
-    /**
-     * Add the event.
-     * @param eventObject event data object
-     */
-    public void addEvent(Event eventObject);
-
-    /**
-     * Get one the event from store.
-     * @param stream name of the stream
-     * @return event object
-     */
-    public Event getEvent(String stream);
+        for (int i = 0; i < 10; ++i) {
+            threadIndex = i;
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    int index = threadIndex;
+                    while (isRunThreads) {
+                        JSONObject jsonObject = generateRandomData("TRACKER TEST");
+                        HashMap<String, String> hashMapObject = new HashMap<String, String>();
+                        double randNum = 1000 * Math.random();
+                        hashMapObject.put("event_name", "JAVA_SDK_TEST");
+                        hashMapObject.put("id", "" + (int) randNum);
+                        hashMapObject.put("float_value", "" + randNum);
+                        hashMapObject.put("strings", "HASHMAP TRACKER TEST");
+                        hashMapObject.put("ts", "" + Utils.getCurrentMilliseconds());
+                        if (index < 5) {
+                            // Sending a JSONObject
+                            tracker_.track(stream, jsonObject.toString(), "");
+                            // Sending a Hash Map (using Gson to springily it)
+                            tracker_.track(stream, new Gson().toJson(hashMapObject), ""); // Sending
+                        } else {
+                            // Send with custom auth key
+                            tracker_.track("ibtest2", jsonObject.toString(), "HMAC AUTH_KEY");
+                        }
+                        try {
+                            Thread.sleep(4000);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+                }
+            });
+            thread.start();
+        }
+        
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            System.exit(2);
+        }
+        System.out.println("Example: Killing tracker threads");
+        tracker_.stop();
+        isRunThreads = false;
+        System.exit(0);
+    }
 }
 ```
-Using custom storage implementation:
+### Low Level API usage
+Using the Low Level API. To see the full code check the [example section](#example)
+```java
+public class Example {
+    public static void main(String[] args) throws JSONException {
+        IronSourceAtom api_ = new IronSourceAtom();
+
+        api_.enableDebug(true); // Enable debug printing
+        api_.setEndpoint("http://track.atom-data.io/");
+        api_.setAuth(authKey); // Set default auth key
+
+        JSONObject dataLowLevelApi = generateRandomData("GET METHOD TEST");
+
+        // putEvent Get method test;
+        Response responseGet = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.GET);
+        dataLowLevelApi.put("strings", "POST METHOD TEST");
+
+        // putEvent Post method test
+        System.out.println("Data: " + responseGet.data + "; Status: " + responseGet.status +
+                "; Error: " + responseGet.error);
+        Response responsePost = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.POST);
+
+        System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status + "; Error: " +
+                responsePost.error);
+
+        // putEvents method test:
+        LinkedList<String> batchData = new LinkedList<String>();
+        for (int i = 0; i < 10; i++) {
+            batchData.add(new Gson().toJson(generateRandomData("BULK TEST")));
+        }
+        Response responseBulk = api_.putEvents(stream, batchData);
+        System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status + "; Error: " + responseBulk.error);
+        System.exit(0);
+    }
+}
+```
+
+### Interface for store data `IEventStorage`.
+Implementation must to be synchronized for multi threading use.
+```java
+/**
+ * Interface for providing a generic way of storing events in a backlog before they are sent to Atom.
+ */
+public interface IEventStorage {
+
+    /**
+     * Add an event.
+     *
+     * @param eventObject event data object
+     */
+    void addEvent(Event eventObject);
+
+    /**
+     * Get one event from data store
+     *
+     * @param stream name of the atom stream
+     * @return event object
+     */
+    Event getEvent(String stream);
+}
+```
+Using custom event storage implementation:
 ```java
 IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
-
-IEventManager customEventManager = new QueueEventManager();
-tracker_.setEventManager(customEventManager);
+// Class: CustomStorageManager must implement interface IEventStorage
+IEventStorage customStorageManager = new CustomStroageManger();
+tracker_.setEventStorage(customStorageManager);
 ```
 
-### Low level API usage
-Example of sending an event in Java:
-```java
-IronSourceAtom api_ = new IronSourceAtom();
-api_.enableDebug(true);
+## Example
+Full example of all SDK features can be found [here](atom-java/atom-sdk/AtomSDK/src/example/java/)
 
-String streamGet = "<YOUR_STREAM_NAME>";
-String authKey = "<YOUR_AUTH_KEY>";
-HashMap<String, String> dataGet = new HashMap<String, String>();
-dataGet.put("strings", "data GET");
-
-Response responseGet = api_.putEvent(streamGet, new Gson().toJson(dataGet), authKey, HttpMethod.GET);
-
-System.out.println("Data: " + responseGet.data);
-
-String streamPost = "<YOUR_STREAM_NAME>";
-String authKeyPost = "<YOUR_AUTH_KEY>";
-HashMap<String, String> dataPost = new HashMap<String, String>();
-dataPost.put("strings", "data POST");
-
-Response responsePost = api_.putEvent(streamPost, new Gson().toJson(dataPost), authKeyPost, HttpMethod.POST);
-
-System.out.println("Data: " + responsePost.data);
-
-String streamBulk = "<YOUR_STREAM_NAME>";
-LinkedList<String> dataBulk = new LinkedList<String>();
-
-HashMap<String, String> dataBulk1 = new HashMap<String, String>();
-dataBulk1.put("strings", "data BULK 1");
-dataBulk.add(new Gson().toJson(dataBulk1));
-
-HashMap<String, String> dataBulk2 = new HashMap<String, String>();
-dataBulk2.put("strings", "data BULK 2");
-dataBulk.add(new Gson().toJson(dataBulk2));
-
-HashMap<String, String> dataBulk3 = new HashMap<String, String>();
-dataBulk3.put("strings", "data BULK 3");
-dataBulk.add(new Gson().toJson(dataBulk3));
-
-api_.setAuth("<YOUR_AUTH_KEY>");
-Response responseBulk = api_.putEvents(streamBulk, dataBulk);
-
-System.out.println("Data: " + responseBulk.data);
-```
 ## License
-MIT
+[MIT][license-url]
 
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE

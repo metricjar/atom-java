@@ -3,6 +3,7 @@ import com.ironsrc.atom.*;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Example {
@@ -10,36 +11,46 @@ public class Example {
     private static int threadIndex;
 
     private static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
-    private static String stream = "sdkdev_sdkdev.public.zeev";
-    private static String authKey = "I40iwPPOsG3dfWX30labriCg9HqMfL";
+    private static String stream = "YOUR.STREAM.NAME";
+    private static String authKey = "YOUR_HMAC_AUTH_KEY";
 
     public static void main(String[] args) throws JSONException {
         // Example of using high level API (Tracker)
-        tracker_.enableDebug(true);
-        tracker_.setAuth(authKey);
         System.out.println("Starting ironSource Atom example");
         System.out.println("=== Tracker Example ===");
-
-        // Test for bulk size
-        tracker_.setBulkBytesSize(2048);
-        tracker_.setBulkSize(50);
-        tracker_.setFlushInterval(5000);
+        // Tracker conf
+        tracker_.enableDebug(true); // Enable of debug msg printing
+        tracker_.setAuth(authKey); // Set default auth key
+        tracker_.setBulkBytesSize(2048); // Set bulk size in bytes (default 512KB)
+        tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 20)
+        tracker_.setFlushInterval(5000); // Set flush interval in ms (default: 30 seconds)
         tracker_.setEndpoint("http://track.atom-data.io/");
 
-        for (int i = 0; i < 1; ++i) {
+        for (int i = 0; i < 10; ++i) {
             threadIndex = i;
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     int index = threadIndex;
                     while (isRunThreads) {
                         JSONObject jsonObject = generateRandomData("TRACKER TEST");
+                        HashMap<String, String> hashMapObject = new HashMap<String, String>();
+                        double randNum = 1000 * Math.random();
+                        hashMapObject.put("event_name", "JAVA_SDK_TEST");
+                        hashMapObject.put("id", "" + (int) randNum);
+                        hashMapObject.put("float_value", "" + randNum);
+                        hashMapObject.put("strings", "HASHMAP TRACKER TEST");
+                        hashMapObject.put("ts", "" + Utils.getCurrentMilliseconds());
                         if (index < 5) {
+                            // Sending a JSONObject
                             tracker_.track(stream, jsonObject.toString(), "");
+                            // Sending a Hash Map (using Gson to springily it)
+                            tracker_.track(stream, new Gson().toJson(hashMapObject), ""); // Sending
                         } else {
-                            tracker_.track("ibtest2", new Gson().toJson(jsonObject), "");
+                            // Send with custom auth key
+                            tracker_.track("ibtest2", jsonObject.toString(), "HMAC AUTH_KEY");
                         }
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(4000);
                         } catch (InterruptedException ex) {
                         }
                     }
@@ -55,7 +66,8 @@ public class Example {
             ex.printStackTrace();
             System.exit(2);
         }
-        System.out.println("Example: Killing Threads");
+        System.out.println("Example: Killing tracker threads");
+        tracker_.flush(); // Flush immediately
         tracker_.stop();
         isRunThreads = false;
 
@@ -64,14 +76,13 @@ public class Example {
 
         IronSourceAtom api_ = new IronSourceAtom();
 
-        api_.enableDebug(true);
+        api_.enableDebug(true); // Enable debug printing
         api_.setEndpoint("http://track.atom-data.io/");
-        api_.setAuth(authKey);
+        api_.setAuth(authKey); // Set default auth key
 
         JSONObject dataLowLevelApi = generateRandomData("GET METHOD TEST");
 
         // putEvent Get method test;
-
         Response responseGet = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.GET);
         dataLowLevelApi.put("strings", "POST METHOD TEST");
 
@@ -98,10 +109,11 @@ public class Example {
         double randNum = 1000 * Math.random();
         JSONObject dataLowLevelApi = new JSONObject();
         try {
-            dataLowLevelApi.put("event_name", "JAVA_TRACKER");
+            dataLowLevelApi.put("event_name", "JAVA_SDK_TEST");
             dataLowLevelApi.put("id", (int) randNum);
             dataLowLevelApi.put("float_value", randNum);
             dataLowLevelApi.put("strings", methodType);
+            dataLowLevelApi.put("ts", Utils.getCurrentMilliseconds());
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -103,13 +103,24 @@ public class IronSourceAtomTracker {
     }
 
     /**
-     * Sets the event storage
+     * Sets the storage manager
+     * This function is here for backwards compatibility reasons
      *
      * @param eventStorage custom backlog events storage
      */
     public void setEventManager(IEventStorage eventStorage) {
         eventsBacklog_ = eventStorage;
     }
+
+    /**
+     * Sets the storage manager
+     *
+     * @param eventStorage custom backlog events storage
+     */
+    public void setEventStorage(IEventStorage eventStorage) {
+        eventsBacklog_ = eventStorage;
+    }
+
 
     /**
      * Enabling print debug information
@@ -141,11 +152,21 @@ public class IronSourceAtomTracker {
 
     /**
      * Set bulk size (amount of events) for flush
+     * This function is here for backwards compatibility reasons
      *
-     * @param bulkSize upon reaching this amount, flush the buffer
+     * @param bulkSize upon reaching this amount of events in buffer, flush the buffer
      */
     public void setBulkSize(int bulkSize) {
         bulkLength_ = bulkSize;
+    }
+
+    /**
+     * Set bulk size (amount of events) for flush
+     *
+     * @param bulkLength upon reaching this amount of events in buff, flush the buffer
+     */
+    public void setBulkLength(int bulkLength) {
+        bulkLength_ = bulkLength;
     }
 
     /**
