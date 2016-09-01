@@ -143,8 +143,8 @@ public class Example {
 }
 ```
 
-### Interface for store data `IEventStorage`.
-Implementation must to be synchronized for multi threading use.
+### Interface for storing data at the tracker backlog `IEventStorage`
+**Implementation must to be synchronized for multi threading use.**
 ```java
 /**
  * Interface for providing a generic way of storing events in a backlog before they are sent to Atom.
@@ -167,6 +167,7 @@ public interface IEventStorage {
     Event getEvent(String stream);
 }
 ```
+
 Using custom event storage implementation:
 ```java
 IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
