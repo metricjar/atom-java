@@ -287,6 +287,8 @@ public class IronSourceAtomTracker {
         HashMap<String, Integer> eventsSize = new HashMap<String, Integer>();
         // Clear size buffer
         Boolean isClearSize = false;
+        // Clear flushData variable
+        boolean isClearFlush = false;
 
         while (isRunWorker_) {
             for (Map.Entry<String, String> entry : streamToAuthMap_.entrySet()) {
@@ -330,13 +332,19 @@ public class IronSourceAtomTracker {
                     printLog("Flushing, Force flush called");
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
-                    isFlushData_ = false;
+                    // We don't set isFlushData_ to "false" here since we can have multiple streams.
+                    // It will be set to "false" after the `foreach loop` has been finished.
+                    isClearFlush = true;
                 }
 
                 if (isClearSize) {
                     eventsSize.put(streamName, 0);
                     isClearSize = false;
                 }
+            }
+            if (isClearFlush) {
+                isFlushData_ = false;
+                isClearFlush = false;
             }
         }
     }

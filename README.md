@@ -12,13 +12,13 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 - [Documentation](https://ironsource.github.io/atom-java/)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Changelog](#changelog)
+- [Change Log](#change-log)
 - [Example](#example)
 
 ## Installation
 
 ### Installation for Gradle Project
-Add add dependency for Atom SDK
+Add dependency for Atom SDK
 ```ruby
 dependencies {
    compile 'com.ironsrc.atom:atom-sdk:1.5.0'
@@ -40,8 +40,12 @@ Add dependency for Atom SDK
 ## Usage
 
 ### High Level API - "Tracker"
+The tracker is used for sending events to Atom based on several conditions
+- Every 30 seconds (default)
+- Number of accumulated events has reached 200 (default)
+- Size of accumulated events has reached 512KB (default)
 
-Using the Tracker. To see the full code check the [example section](#example)
+To see the full code check the [example section](#example)
 ```java
 public class Example {
     private static Boolean isRunThreads = true;
@@ -56,7 +60,8 @@ public class Example {
         tracker_.enableDebug(true); // Enable of debug msg printing
         tracker_.setAuth(authKey); // Set default auth key
         tracker_.setBulkBytesSize(2048); // Set bulk size in bytes (default 512KB)
-        tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 20)
+        //tracker_.setBulkKiloBytesSize(1); // Set bulk size in Kilobytes (default 512KB)
+        tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 200)
         tracker_.setFlushInterval(5000); // Set flush interval in ms (default: 30 seconds)
         tracker_.setEndpoint("http://track.atom-data.io/");
 
@@ -84,10 +89,12 @@ public class Example {
                             tracker_.track("ibtest2", jsonObject.toString(), "HMAC AUTH_KEY");
                         }
                         try {
-                            Thread.sleep(4000);
-                        } catch (InterruptedException ex) {
-                        }
-                    }
+                              Thread.sleep(4000);
+                        } catch (InterruptedException e) {
+                               e.printStackTrace();
+                          }
+                     }
+                    
                 }
             });
             thread.start();
@@ -107,7 +114,11 @@ public class Example {
 }
 ```
 ### Low Level API usage
-Using the Low Level API. To see the full code check the [example section](#example)
+The Low Level API has 2 methods:  
+- putEvent - Sends a single event to Atom  
+- putEvents - Sends a bulk (batch) of events to Atom
+  
+To see the full code check the [example section](#example)
 ```java
 public class Example {
     public static void main(String[] args) throws JSONException {
@@ -117,16 +128,15 @@ public class Example {
         api_.setEndpoint("http://track.atom-data.io/");
         api_.setAuth(authKey); // Set default auth key
 
-        JSONObject dataLowLevelApi = generateRandomData("GET METHOD TEST");
-
+        JSONObject dataLowLevelApi = generateRandomData("JAVA SDK GET METHOD");
         // putEvent Get method test;
-        Response responseGet = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.GET);
-        dataLowLevelApi.put("strings", "POST METHOD TEST");
+        Response responseGet = api_.putEvent(stream, dataLowLevelApi.toString(), authKey, HttpMethod.GET);
+        dataLowLevelApi.put("strings", "JAVA SDK POST METHOD");
 
         // putEvent Post method test
         System.out.println("Data: " + responseGet.data + "; Status: " + responseGet.status +
                 "; Error: " + responseGet.error);
-        Response responsePost = api_.putEvent(stream, new Gson().toJson(dataLowLevelApi), authKey, HttpMethod.POST);
+        Response responsePost = api_.putEvent(stream, dataLowLevelApi.toString(), authKey, HttpMethod.POST);
 
         System.out.println("Data: " + responsePost.data + "; Status: " + responsePost.status + "; Error: " +
                 responsePost.error);
@@ -134,7 +144,7 @@ public class Example {
         // putEvents method test:
         LinkedList<String> batchData = new LinkedList<String>();
         for (int i = 0; i < 10; i++) {
-            batchData.add(new Gson().toJson(generateRandomData("BULK TEST")));
+            batchData.add(generateRandomData("JAVA SDK BULK").toString());
         }
         Response responseBulk = api_.putEvents(stream, batchData);
         System.out.println("Data: " + responseBulk.data + "; Status: " + responseBulk.status + "; Error: " + responseBulk.error);
@@ -171,13 +181,43 @@ public interface IEventStorage {
 Using custom event storage implementation:
 ```java
 IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
-// Class: CustomStorageManager must implement interface IEventStorage
+// Class CustomStorageManager must implement interface IEventStorage and must be synchronized
 IEventStorage customStorageManager = new CustomStroageManger();
 tracker_.setEventStorage(customStorageManager);
 ```
 
+## Change Log
+
+### v1.5.0
+Note: this version if fully compatible with the old ones except for class name changes.  
+The usage of the tracker and Atom class methods should not be affected.
+- Added a Maven Repository in Maven Central
+- Tracker changes
+    - Changed the flushInterval control
+    - Fixing a bug in isClearSize boolean var (was not set to false after iteration)
+    - eventWorker renamed to trackerHandler
+    - Changed some variables and internal function names
+    - fixed a bug in tracker pool size and thread count and changed default thread count
+- Atom Class changes
+    - Renamed GetRequestData function to createRequestData
+- Renamed EventManager interface to EventStorage
+- Renamed QueueEventManager to QueueEventStorage
+- Renamed EventTask class to BatchEvent
+- Renamed EventTaskPool class to BatchEventPool
+- Rewrote and improved all the JavaDocs
+- Refactored and improved the example
+    
+### v1.1.0
+- Tracker Class
+- EventManager (EventStorage) interface
+- Maven repository (in GitHub)
+
+### v1.0.0
+- Basic features: putEvent & putEvents functionalities
+
+
 ## Example
-Full example of all SDK features can be found [here](atom-java/atom-sdk/AtomSDK/src/example/java/)
+Full example of all SDK features can be found [here](atom-sdk/AtomSDK/src/example/java/)
 
 ## License
 [MIT][license-url]

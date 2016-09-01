@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class IronSourceAtom {
     private static String TAG_ = "IronSourceAtom";
-    protected static String API_VERSION_ = "V1.1.1";
+    protected static String API_VERSION_ = "V1.5.0";
     protected String endpoint_ = "http://track.atom-data.io/";
     protected String authKey_ = "";
 
