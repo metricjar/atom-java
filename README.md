@@ -82,7 +82,7 @@ public class Example {
                         if (index < 5) {
                             // Sending a JSONObject
                             tracker_.track(stream, jsonObject.toString(), "");
-                            // Sending a Hash Map (using Gson to springily it)
+                            // Sending a Hash Map (using Gson to stringify it)
                             tracker_.track(stream, new Gson().toJson(hashMapObject), ""); // Sending
                         } else {
                             // Send with custom auth key
