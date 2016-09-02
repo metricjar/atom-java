@@ -1,6 +1,3 @@
-/**
- * Created by g8y3e on 7/18/16.
- */
 package com.ironsrc.atom;
 
 import java.io.BufferedReader;
@@ -13,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * For send HTTP requests to server
+ * Wrapper for HTTP requests to Atom API
  */
 public class Request {
     private static String TAG_ = "Request";
@@ -29,9 +26,10 @@ public class Request {
 
     /**
      * Constructor for Request
-     * @param url for server address
-     * @param data for sending data
-     * @param headers for sending headers
+     *
+     * @param url     Atom API address
+     * @param data    data that should be sent
+     * @param headers HTTP request headers
      */
     public Request(String url, String data, HashMap<String, String> headers) {
         url_ = url;
@@ -40,7 +38,8 @@ public class Request {
     }
 
     /**
-     * Enable print debug information
+     * Enable printing of debug information
+     *
      * @param isDebug debug state
      */
     public void enableDebug(Boolean isDebug) {
@@ -48,10 +47,11 @@ public class Request {
     }
 
     /**
-     * GET request to server
+     * Prepare a GET request to Atom
+     *
      * @return response from server
      */
-    public Response Get() {
+    public Response get() {
         String encoding = "UTF-8";
         String url = url_ + "?data=" + Utils.urlEncode(Utils.base64Encode(data_, encoding), encoding);
         printLog("Request URL: " + url);
@@ -60,19 +60,21 @@ public class Request {
     }
 
     /**
-     * POST request to server
+     * Prepare a POST request to Atom
+     *
      * @return response from server
      */
-    public Response Post() {
+    public Response post() {
         printLog("Request URL: " + url_);
 
         return sendRequest(url_, "POST");
     }
 
     /**
-     * Sends the request.
-     * @param url server url
-     * @param method send data
+     * Send request to Atom server
+     *
+     * @param url    Atom API url
+     * @param method HTTP method
      * @return response from server
      */
     private Response sendRequest(String url, String method) {
@@ -139,9 +141,10 @@ public class Request {
     }
 
     /**
-     * Create Http Url connection
-     * @param url host server url
-     * @return http url object
+     * Create HTTP Url connection
+     *
+     * @param url Atom API url
+     * @return http url connection object
      * @throws IOException
      */
     private HttpURLConnection createConnection(String url) throws IOException {
@@ -154,6 +157,7 @@ public class Request {
 
     /**
      * Prints the log.
+     *
      * @param logData print debug data
      */
     protected void printLog(String logData) {

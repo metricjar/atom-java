@@ -1,6 +1,3 @@
-/**
- * Created by g8y3e on 7/18/16.
- */
 package com.ironsrc.atom;
 
 public class Response {
@@ -10,9 +7,10 @@ public class Response {
 
     /**
      * Constructor for Response
-     * @param error for server reponse error message
-     * @param data for server response data
-     * @param status for server reponse status
+     *
+     * @param error  Atom API response error message
+     * @param data   Atom API response data
+     * @param status Atom API response status
      */
     public Response(String error, String data, int status) {
         this.error = error;

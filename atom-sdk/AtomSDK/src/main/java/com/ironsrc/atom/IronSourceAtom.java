@@ -1,19 +1,14 @@
-/**
- * Created by g8y3e on 7/18/16.
- */
 package com.ironsrc.atom;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
- * ironSource Atom low level API class, supports putEvent() and putEvents()
+ * ironSource Atom low level API. supports putEvent() and putEvents() methods.
  */
 public class IronSourceAtom {
     private static String TAG_ = "IronSourceAtom";
-
-    protected static String API_VERSION_ = "V1.0.0";
-
+    protected static String API_VERSION_ = "V1.5.0";
     protected String endpoint_ = "http://track.atom-data.io/";
     protected String authKey_ = "";
 
@@ -22,7 +17,7 @@ public class IronSourceAtom {
     protected Boolean isDebug_ = false;
 
     /**
-     * Constructor for simple API
+     * Constructor for low-level API
      */
     public IronSourceAtom() {
         initHeaders();
@@ -30,6 +25,7 @@ public class IronSourceAtom {
 
     /**
      * Enable print debug information
+     *
      * @param isDebug debug state
      */
     public void enableDebug(Boolean isDebug) {
@@ -37,16 +33,17 @@ public class IronSourceAtom {
     }
 
     /**
-     * Init header for server
+     * Init headers
      */
     protected void initHeaders() {
-        headers_.put("x-ironsource-atom-sdk-type", "dotnet");
+        headers_.put("x-ironsource-atom-sdk-type", "java");
         headers_.put("x-ironsource-atom-sdk-version", IronSourceAtom.API_VERSION_);
     }
 
     /**
      * Set auth key
-     * @param authKey auth key for stream
+     *
+     * @param authKey HMAC auth key for stream
      */
     public void setAuth(String authKey) {
         authKey_ = authKey;
@@ -54,7 +51,8 @@ public class IronSourceAtom {
 
     /**
      * Get auth key
-     * @return auth key
+     *
+     * @return HMAC auth key for stream
      */
     public String getAuth() {
         return authKey_;
@@ -62,6 +60,7 @@ public class IronSourceAtom {
 
     /**
      * Set server host
+     *
      * @param endpoint server url
      */
     public void setEndpoint(String endpoint) {
@@ -70,6 +69,7 @@ public class IronSourceAtom {
 
     /**
      * Get server host
+     *
      * @return server url
      */
     public String getEndpoint() {
@@ -77,50 +77,54 @@ public class IronSourceAtom {
     }
 
     /**
-     * Send single data to Atom server.
-     * @param stream stream name for saving data in db table
-     * @param data user data to send
-     * @param authKey auth key for stream
-     * @param method for POST or GET method for do request
-     * @return response from server
+     * Send send a single event to Atom API
+     *
+     * @param stream  atom stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
+     * @param method  POST or GET method for HTTP request
+     * @return response response from server
      */
     public Response putEvent(String stream, String data, String authKey, HttpMethod method) {
         if (authKey.length() == 0) {
             authKey = authKey_;
         }
 
-        String jsonEvent = GetRequestData(stream, data, authKey);
+        String jsonEvent = createRequestData(stream, data, authKey);
         return this.sendEvent(endpoint_, method, headers_, jsonEvent);
     }
 
     /**
-     * Send single data to Atom server.
+     * Send send a single event to Atom API
+     *
      * @param stream stream name for saving data in db table
-     * @param data user data to send
-     * @param method for POST or GET method for do request
-     * @return response from server
+     * @param data   user data to send
+     * @param method POST or GET method for HTTP request
+     * @return response response from server
      */
     public Response putEvent(String stream, String data, HttpMethod method) {
         return this.putEvent(stream, data, "", method);
     }
 
     /**
-     * Send single data to Atom server.
-     * @param stream stream name for saving data in db table
-     * @param data user data to send
-     * @param authKey auth key for stream
-     * @return response from server
+     * Send send a single event to Atom API
+     *
+     * @param stream  stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
+     * @return response response from server
      */
     public Response putEvent(String stream, String data, String authKey) {
         return this.putEvent(stream, data, authKey, HttpMethod.POST);
     }
 
     /**
-     * Send multiple events data to Atom server.
-     * @param stream for name of stream
-     * @param data for request data
-     * @param authKey auth key for stream
-     * @return response from server
+     * Send multiple events (batch) to Atom API
+     *
+     * @param stream  stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
+     * @return response response from server
      */
     public Response putEvents(String stream, String data, String authKey) {
         if (authKey.length() == 0) {
@@ -130,38 +134,40 @@ public class IronSourceAtom {
         HttpMethod method = HttpMethod.POST;
         printLog("Key: " + authKey_);
 
-        String jsonEvent = GetRequestData(stream, data, authKey);
+        String jsonEvent = createRequestData(stream, data, authKey);
 
         return this.sendEvent(endpoint_ + "bulk", method, headers_, jsonEvent);
     }
 
     /**
-     * Send multiple events data to Atom server.
-     * @param stream for name of stream
-     * @param data for request data
-     * @param authKey auth key for stream
-     * @return response from server
+     * Send multiple events (batch) to Atom API
+     *
+     * @param stream  stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
+     * @return response response from server
      */
-    public Response putEvents(String stream, LinkedList<String> data,
-                                String authKey) {
+    public Response putEvents(String stream, List<String> data, String authKey) {
         String json = Utils.listToJson(data);
         return this.putEvents(stream, json, authKey);
     }
 
     /**
-     * Send multiple events data to Atom server.
-     * @param stream for name of stream
-     * @param data for request data
+     * Send multiple events (batch) to Atom API
+     *
+     * @param stream stream name for saving data in db table
+     * @param data   user data to send
      * @return response from server
      */
-    public Response putEvents(String stream, LinkedList<String> data) {
-       return this.putEvents(stream, data, "");
+    public Response putEvents(String stream, List<String> data) {
+        return this.putEvents(stream, data, "");
     }
 
     /**
-     * Send multiple events data to Atom server.
-     * @param stream for name of stream
-     * @param data for request data
+     * Send multiple events (batch) to Atom API.
+     *
+     * @param stream stream name for saving data in db table
+     * @param data   user data to send
      * @return response from server
      */
     public Response putEvents(String stream, String data) {
@@ -169,7 +175,7 @@ public class IronSourceAtom {
     }
 
     /**
-     * Check health of server
+     * Preform health check to Atom API
      */
     public void health() {
         this.sendEvent(endpoint_ + "health", HttpMethod.GET, headers_, "");
@@ -177,17 +183,17 @@ public class IronSourceAtom {
 
     /**
      * Create request json data
-     * @param stream for request stream
-     * @param data for request data
-     * @param authKey auth key for stream
+     *
+     * @param stream  stream name for saving data in db table
+     * @param data    user data to send
+     * @param authKey HMAC auth key for stream
      * @return request json data
      */
-    protected String GetRequestData(String stream, String data, String authKey) {
+    protected String createRequestData(String stream, String data, String authKey) {
         String hash = "";
         if (authKey.length() > 0) {
             hash = Utils.encodeHmac(data, authKey);
         }
-
 
         HashMap<String, String> eventObject = new HashMap<String, String>();
         eventObject.put("table", stream);
@@ -203,23 +209,24 @@ public class IronSourceAtom {
     }
 
     /**
-     * Send data to server
-     * @param url for server address
-     * @param method for POST or GET method
-     * @param headers headers data for request
-     * @param data for request data
+     * Send data to Atom API
+     *
+     * @param url     atom API url
+     * @param method  HTTP METHOD (POST or GET)
+     * @param headers headers for request
+     * @param data    user data to send
      * @return response from server
      */
-    protected Response sendEvent(String url, HttpMethod method, HashMap<String, String> headers,
-                                 String data) {
+    protected Response sendEvent(String url, HttpMethod method, HashMap<String, String> headers, String data) {
         Request request = new Request(url, data, headers);
         request.enableDebug(isDebug_);
-        return (method == HttpMethod.GET) ? request.Get() : request.Post();
+        return (method == HttpMethod.GET) ? request.get() : request.post();
     }
 
     /**
      * Prints the log.
-     * @param logData  print debug data
+     *
+     * @param logData print debug data
      */
     protected void printLog(String logData) {
         if (isDebug_) {
