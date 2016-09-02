@@ -230,5 +230,5 @@ Full example of all SDK features can be found [here](atom-sdk/AtomSDK/src/exampl
 [travis-url]: https://travis-ci.org/ironSource/atom-java
 [coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
-[maven-image]: https://img.shields.io/badge/maven%20build-v1.1.0-green.svg
-[maven-url]: http://search.maven.org/#artifactdetails%7Ccom.ironsrc.atom%7Catom-sdk%7C1.1.0%7Cjar
+[maven-image]: https://img.shields.io/badge/maven%20build-v1.5.0-green.svg
+[maven-url]: http://search.maven.org/#artifactdetails%7Ccom.ironsrc.atom%7Catom-sdk%7C1.5.0%7Cjar
