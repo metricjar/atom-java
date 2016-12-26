@@ -264,7 +264,9 @@ public class IronSourceAtomTracker {
         try {
             batchEventPool_.addEvent(new BatchEvent(stream, authKey, buffer) {
                 public void action() {
-                    flushData(this.stream_, this.authKey_, this.buffer_);
+                    if(this.buffer_.size() > 0) {
+                        flushData(this.stream_, this.authKey_, this.buffer_);
+                    }
                 }
             });
         } catch (Exception ex) {
@@ -314,27 +316,21 @@ public class IronSourceAtomTracker {
                 eventsBuffer.get(streamName).add(eventObject.data_);
 
                 // Flush when reaching {bulkByteSize} KB of events
-                if (eventsSize.get(streamName) >= bulkBytesSize_) {
-                    printLog("Flushing, bulk size reached: " + eventsSize.get(streamName));
-                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
-                    isClearSize = true;
-                }
-
-                // Flush when {bulkLength} (amount of events) has been reached
-                if (eventsBuffer.get(streamName).size() >= bulkLength_) {
-                    printLog("Flushing, bulk length reached: " + eventsBuffer.get(streamName).size());
-                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
-                    isClearSize = true;
-                }
-
-                // Force flush
-                if (isFlushData_) {
+                if (isFlushData_) {  // Force flush
                     printLog("Flushing, Force flush called");
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
                     // We don't set isFlushData_ to "false" here since we can have multiple streams.
                     // It will be set to "false" after the `foreach loop` has been finished.
                     isClearFlush = true;
+                } else if (eventsSize.get(streamName) >= bulkBytesSize_) {
+                    printLog("Flushing, bulk size reached: " + eventsSize.get(streamName));
+                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
+                    isClearSize = true;
+                } else if (eventsBuffer.get(streamName).size() >= bulkLength_) { // Flush when {bulkLength} (amount of events) has been reached
+                    printLog("Flushing, bulk length reached: " + eventsBuffer.get(streamName).size());
+                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
+                    isClearSize = true;
                 }
 
                 if (isClearSize) {

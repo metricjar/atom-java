@@ -14,7 +14,7 @@
 
     <groupId>com.ironsrc.atom</groupId>
     <artifactId>atom-sdk</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <name>Atom SDK</name>
     <description>ironSource Atom SDK</description>
@@ -175,6 +175,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

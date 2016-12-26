@@ -37,7 +37,8 @@ public class Utils {
         }
 
         resultJson = resultJson.substring(0, resultJson.length() - 1);
-        resultJson += "]";
+
+       resultJson += "]";
 
         return resultJson;
     }

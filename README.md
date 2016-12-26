@@ -21,7 +21,7 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 Add dependency for Atom SDK
 ```ruby
 dependencies {
-   compile 'com.ironsrc.atom:atom-sdk:1.5.0'
+   compile 'com.ironsrc.atom:atom-sdk:1.5.1'
 }
 ```
 
@@ -32,7 +32,7 @@ Add dependency for Atom SDK
     <dependency>
         <groupId>com.ironsrc.atom</groupId>
         <artifactId>atom-sdk</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
     </dependency>
 </dependencies>
 ```
@@ -187,6 +187,10 @@ tracker_.setEventStorage(customStorageManager);
 ```
 
 ## Change Log
+
+### v1.5.1
+- Fixed a bug in tracker that caused several conditions to flush at the same time
+- Added example with static usage of the SDK
 
 ### v1.5.0
 Note: this version if fully compatible with the old ones except for class name changes.  
