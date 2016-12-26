@@ -3,15 +3,10 @@ package com.ironsrc.test;
 import com.google.gson.Gson;
 import com.ironsrc.atom.IronSourceAtom;
 import com.ironsrc.atom.IronSourceAtomTracker;
-import com.ironsrc.atom.Utils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.StreamHandler;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 class MultiThreadTest {
     private static String stream = "sdkdev_sdkdev.public.g8y3etest";
@@ -30,45 +25,42 @@ class MultiThreadTest {
     }
 
     public static void runTest() {
-        List<Thread> threads = new ArrayList<Thread>();
-        IntStream.range(0, 10).forEach(index -> {
-            Thread threadObj = new Thread(() -> {
-                int randTimer = (int)(2000 * Math.random());
-                try {
-                    Thread.sleep(randTimer);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        List<Thread> threads = new ArrayList<>();
+        for (int index = 0; index < 10; ++index) {
+            final int threadID = index;
+            Thread threadObj = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int randTimer = (int) (2000 * Math.random());
+                    try {
+                        Thread.sleep(randTimer);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                System.out.println("From thread id: " + index);
+                    System.out.println("From thread id: " + threadID);
 
-                for (int reqIndex = 0; reqIndex < 6; reqIndex++) {
-                    HashMap<String, String> dataMap = new HashMap<String, String>();
+                    for (int reqIndex = 0; reqIndex < 6; reqIndex++) {
+                        HashMap<String, String> dataMap = new HashMap<String, String>();
 
-                    dataMap.put("strings", "data " + reqIndex);
-                    dataMap.put("id", "" + index);
+                        dataMap.put("strings", "data " + reqIndex);
+                        dataMap.put("id", "" + threadID);
 
-                    System.out.println("Request: " + new Gson().toJson(dataMap));
-                    atomTracker_.track(stream, new Gson().toJson(dataMap));
+                        System.out.println("Request: " + new Gson().toJson(dataMap));
+                        atomTracker_.track(stream, new Gson().toJson(dataMap));
+                    }
                 }
             });
             threadObj.run();
 
             threads.add(threadObj);
-        });
+        }
 
         try {
             Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        threads.stream().forEach(thread -> {
-            /*try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-        });
 
         atomTracker_.flush();
     }
