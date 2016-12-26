@@ -266,8 +266,6 @@ public class IronSourceAtomTracker {
                 public void action() {
                     if(this.buffer_.size() > 0) {
                         flushData(this.stream_, this.authKey_, this.buffer_);
-                    } else {
-                        System.out.println("ddd");
                     }
                 }
             });
