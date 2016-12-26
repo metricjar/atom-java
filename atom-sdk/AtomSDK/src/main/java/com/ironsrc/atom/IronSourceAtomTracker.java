@@ -318,7 +318,14 @@ public class IronSourceAtomTracker {
                 eventsBuffer.get(streamName).add(eventObject.data_);
 
                 // Flush when reaching {bulkByteSize} KB of events
-                if (eventsSize.get(streamName) >= bulkBytesSize_) {
+                if (isFlushData_) {  // Force flush
+                    printLog("Flushing, Force flush called");
+                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
+                    isClearSize = true;
+                    // We don't set isFlushData_ to "false" here since we can have multiple streams.
+                    // It will be set to "false" after the `foreach loop` has been finished.
+                    isClearFlush = true;
+                } else if (eventsSize.get(streamName) >= bulkBytesSize_) {
                     printLog("Flushing, bulk size reached: " + eventsSize.get(streamName));
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
@@ -326,13 +333,6 @@ public class IronSourceAtomTracker {
                     printLog("Flushing, bulk length reached: " + eventsBuffer.get(streamName).size());
                     flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
                     isClearSize = true;
-                } else if (isFlushData_) {  // Force flush
-                    printLog("Flushing, Force flush called");
-                    flushEvent(streamName, streamToAuthMap_.get(streamName), eventsBuffer.get(streamName));
-                    isClearSize = true;
-                    // We don't set isFlushData_ to "false" here since we can have multiple streams.
-                    // It will be set to "false" after the `foreach loop` has been finished.
-                    isClearFlush = true;
                 }
 
                 if (isClearSize) {
