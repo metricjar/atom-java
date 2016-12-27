@@ -21,7 +21,7 @@ atom-java is the official [ironSource.atom](http://www.ironsrc.com/data-flow-man
 Add dependency for Atom SDK
 ```ruby
 dependencies {
-   compile 'com.ironsrc.atom:atom-sdk:1.5.1'
+   compile 'com.ironsrc.atom:atom-sdk:1.5.2'
 }
 ```
 
@@ -32,7 +32,7 @@ Add dependency for Atom SDK
     <dependency>
         <groupId>com.ironsrc.atom</groupId>
         <artifactId>atom-sdk</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </dependency>
 </dependencies>
 ```
@@ -45,13 +45,34 @@ The tracker is used for sending events to Atom based on several conditions
 - Number of accumulated events has reached 200 (default)
 - Size of accumulated events has reached 512KB (default)
 
+The tracker is a based on a thread pool which is controlled by BatchEventPool and a backlog (QueueEventStorage)    
+By default the BatchEventPool is configured to use 1 thread (worker), you can change it when constructing the tracker.
 To see the full code check the [example section](#example)
+
 ```java
+
 public class Example {
     private static Boolean isRunThreads = true;
     private static int threadIndex;
+    
+    // This are the tracker defaults:
+    // Number of concurrent worker threads for BatchEventPool workers
+    private static int BATCH_WORKERS_COUNT_ = 1;
+    
+    // Number of batch events inside BatchEventPool
+    private static int BATCH_POOL_SIZE_ = 10;
+    
+    // Tracker flush interval in milliseconds
+    private long flushInterval_ = 30000;
+    
+    //Number of events per bulk (batch)
+    private int bulkLength_ = 200;
+    
+    //The size of the bulk in bytes.
+    private int bulkBytesSize_ = 512 * 1024;
 
-    private static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker();
+    // Init a new tracker (the parameters are optional)
+    private static IronSourceAtomTracker tracker_ = new IronSourceAtomTracker(BATCH_WORKERS_COUNT_, BATCH_POOL_SIZE_);
     private static String stream = "YOUR.STREAM.NAME";
     private static String authKey = "HMAC_AUTH_KEY";
 
@@ -60,7 +81,7 @@ public class Example {
         tracker_.enableDebug(true); // Enable of debug msg printing
         tracker_.setAuth(authKey); // Set default auth key
         tracker_.setBulkBytesSize(2048); // Set bulk size in bytes (default 512KB)
-        //tracker_.setBulkKiloBytesSize(1); // Set bulk size in Kilobytes (default 512KB)
+        tracker_.setBulkKiloBytesSize(1); // Set bulk size in Kilobytes (default 512KB)
         tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 200)
         tracker_.setFlushInterval(5000); // Set flush interval in ms (default: 30 seconds)
         tracker_.setEndpoint("http://track.atom-data.io/");
@@ -188,6 +209,10 @@ tracker_.setEventStorage(customStorageManager);
 
 ## Change Log
 
+### v1.5.2
+- Changed tracker defaults for BatchEventPool
+- Updated example
+
 ### v1.5.1
 - Fixed a bug in tracker that caused several conditions to flush at the same time
 - Added example with static usage of the SDK
@@ -219,9 +244,8 @@ The usage of the tracker and Atom class methods should not be affected.
 ### v1.0.0
 - Basic features: putEvent & putEvents functionalities
 
-
 ## Example
-Full example of all SDK features can be found [here](atom-sdk/AtomSDK/src/example/java/)
+Full example of all SDK features (both static class and regular) can be found [here](atom-sdk/AtomSDK/src/example/java/)
 
 ## License
 [MIT][license-url]
@@ -234,5 +258,5 @@ Full example of all SDK features can be found [here](atom-sdk/AtomSDK/src/exampl
 [travis-url]: https://travis-ci.org/ironSource/atom-java
 [coverage-image]: https://coveralls.io/repos/github/ironSource/atom-java/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/ironSource/atom-java?branch=master
-[maven-image]: https://img.shields.io/badge/maven%20build-v1.5.0-green.svg
-[maven-url]: http://search.maven.org/#artifactdetails%7Ccom.ironsrc.atom%7Catom-sdk%7C1.5.0%7Cjar
+[maven-image]: https://img.shields.io/badge/maven%20build-v1.5.2-green.svg
+[maven-url]: http://search.maven.org/#artifactdetails%7Ccom.ironsrc.atom%7Catom-sdk%7C1.5.2%7Cjar
