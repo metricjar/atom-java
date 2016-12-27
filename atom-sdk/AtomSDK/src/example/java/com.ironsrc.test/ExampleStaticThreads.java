@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 
 class MultiThreadTest {
-    private static String stream = "sdkdev_sdkdev.public.g8y3etest";
-    private static String authKey = "I40iwPPOsG3dfWX30labriCg9HqMfL";
+    private static String stream = "YOUR.STREAM.NAME";
+    private static String authKey = "YOUR_HMAC_AUTH_KEY";
 
     static IronSourceAtom atom_;
     static IronSourceAtomTracker atomTracker_ = new IronSourceAtomTracker();

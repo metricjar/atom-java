@@ -10,10 +10,10 @@ public class IronSourceAtomTracker {
     private static String TAG_ = "IronSourceAtomTracker";
 
     // Number of concurrent worker threads for BatchEventPool workers
-    private static int BATCH_WORKERS_COUNT_ = 5;
+    private static int BATCH_WORKERS_COUNT_ = 1;
 
     // Number of batch events inside BatchEventPool
-    private static int BATCH_POOL_SIZE_ = 5000;
+    private static int BATCH_POOL_SIZE_ = 10;
 
     // Tracker flush interval in milliseconds
     private long flushInterval_ = 30000;
@@ -88,7 +88,7 @@ public class IronSourceAtomTracker {
             public void run() {
                 isFlushData_ = true;
             }
-        }, 0, flushInterval_);
+        }, flushInterval_, flushInterval_);
     }
 
     /**
@@ -264,7 +264,7 @@ public class IronSourceAtomTracker {
         try {
             batchEventPool_.addEvent(new BatchEvent(stream, authKey, buffer) {
                 public void action() {
-                    if(this.buffer_.size() > 0) {
+                    if (this.buffer_.size() > 0) {
                         flushData(this.stream_, this.authKey_, this.buffer_);
                     }
                 }
