@@ -24,7 +24,7 @@ public class Example {
         tracker_.enableDebug(true); // Enable of debug msg printing
         tracker_.setAuth(authKey); // Set default auth key
         tracker_.setBulkBytesSize(2048); // Set bulk size in bytes (default 512KB)
-        //tracker_.setBulkKiloBytesSize(1); // Set bulk size in Kilobytes (default 512KB)
+        tracker_.setBulkKiloBytesSize(1); // Set bulk size in Kilobytes (default 512KB)
         tracker_.setBulkSize(50); // Set Number of events per bulk (batch) (default: 20)
         tracker_.setFlushInterval(5000); // Set flush interval in ms (default: 30 seconds)
         tracker_.setEndpoint("http://track.atom-data.io/");

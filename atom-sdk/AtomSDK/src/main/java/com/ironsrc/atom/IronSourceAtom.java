@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class IronSourceAtom {
     private static String TAG_ = "IronSourceAtom";
-    protected static String API_VERSION_ = "V1.5.1";
+    protected static String SDK_VERSION_ = "V1.5.2";
     protected String endpoint_ = "http://track.atom-data.io/";
     protected String authKey_ = "";
 
@@ -37,7 +37,7 @@ public class IronSourceAtom {
      */
     protected void initHeaders() {
         headers_.put("x-ironsource-atom-sdk-type", "java");
-        headers_.put("x-ironsource-atom-sdk-version", IronSourceAtom.API_VERSION_);
+        headers_.put("x-ironsource-atom-sdk-version", IronSourceAtom.SDK_VERSION_);
     }
 
     /**
